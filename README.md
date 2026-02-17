@@ -14,7 +14,6 @@ Website [https://birds.teamepoch.ai/](https://birds.teamepoch.ai/)
 * **Submission Auditing:** Upload your `submission.csv`. The app calculates your **mAP score** locally and allows you to filter the map by specific predictions.
 * **Debug Columns:** Inject internal model states (embeddings, cluster IDs) into your submission CSV to visualize them alongside ground truth.
 * **Statistics Lab:** Analyze Covariate Shift by comparing Feature Distributions between Train and Test sets.
-* **Performance:** Uses IndexedDB for aggressive data caching (instant reloads) and batched WASM processing.
 
 ## Quick Start
 
@@ -30,12 +29,10 @@ Place your `train.csv` and `test.csv` in the root folder from [https://www.kaggl
 
 3. **Run:**
 Because the app fetches CSV files and uses WebAssembly, it works best when served via a local server (to avoid CORS issues).
+
 ```bash
-# Python 3
-python -m http.server 8000
-
+uv run app.py
 ```
-
 
 Then open `http://localhost:8000` in your browser.
 *> **Note:** You can also drag-and-drop CSV files directly into the UI if you don't want to run a local server.*
@@ -128,4 +125,6 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ## License
 
-[MIT](https://choosealicense.com/licenses/mit/)
+Source code is licensed under [MIT](https://choosealicense.com/licenses/mit/)
+
+The datasets are excluded from MIT and have their own conditions. Please see the LICENSE file

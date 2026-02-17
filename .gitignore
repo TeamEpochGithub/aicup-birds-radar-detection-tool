@@ -1,2 +1,10 @@
-train.csv
+# Please participate in https://www.kaggle.com/competitions/ai-cup-2026-performance to get the test.csv
 test.csv
+
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.venv

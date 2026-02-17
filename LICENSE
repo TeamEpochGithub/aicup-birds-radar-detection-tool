@@ -19,3 +19,36 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+--------------------------------------------------------------------------------
+
+DATA USE RESTRICTIONS & EXCEPTIONS
+
+The MIT License above applies to the source code and documentation of this 
+repository. It DOES NOT apply to the dataset files included in this repository, 
+specifically:
+- train.csv
+- test.csv
+- train.bin
+- test.bin
+- introduction_notebook_submission.csv
+
+These data files are the property of TNO (Netherlands Organisation for Applied 
+Scientific Research) and are provided subject to the following strict conditions:
+
+1. ACADEMIC & NON-COMMERCIAL USE ONLY
+   The data may only be used for academic and non-commercial purposes. 
+   Commercial use is strictly prohibited.
+
+2. COMPETITION RULES (TEST SET)
+   Access to and use of the test set (`test.csv`, `test.bin`, `introduction_notebook_submission.csv`) is strictly 
+   conditional upon agreeing to the terms and rules of the AI Cup 2026 – 
+   Performance Track competition. By accessing these files, you acknowledge 
+   that you have read and agreed to the rules located at:
+   https://www.kaggle.com/competitions/ai-cup-2026-performance/rules, especially section 2.4 Competition Data
+
+3. NO REVERSE ENGINEERING
+   You may not attempt to reverse engineer, de-anonymize, or manually label 
+   the test set data.
+
+   You agree that you use the test data for competition purposes only.

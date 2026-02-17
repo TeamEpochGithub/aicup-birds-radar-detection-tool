@@ -3,257 +3,18 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Bird track radar | AI Cup 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preload" href="/train.csv" as="fetch" crossorigin="anonymous">
-    <link rel="preload" href="/test.csv" as="fetch" crossorigin="anonymous">
-    <style>
-        body {
-            background: #0f172a;
-            color: #cbd5e1;
-            font-family: 'Segoe UI', sans-serif;
-            overflow: hidden;
-        }
-
-        .panel {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-        }
-
-        .btn {
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 0.75rem;
-            white-space: nowrap;
-        }
-
-        .btn-blue {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .btn-blue:hover {
-            background: #2563eb;
-        }
-
-        .btn-green {
-            background: #10b981;
-            color: white;
-        }
-
-        .btn-green:hover {
-            background: #059669;
-        }
-
-        .btn-orange {
-            background: #f97316;
-            color: white;
-        }
-
-        .btn-orange:hover {
-            background: #ea580c;
-        }
-
-        .btn-purple {
-            background: #a855f7;
-            color: white;
-        }
-
-        .btn-purple:hover {
-            background: #9333ea;
-        }
-
-        .btn-gray {
-            background: #475569;
-            color: white;
-        }
-
-        .btn-gray:hover {
-            background: #334155;
-        }
-
-        .btn-red {
-            background: #ef4444;
-            color: white;
-        }
-
-        .btn-red:hover {
-            background: #dc2626;
-        }
-
-        .btn-file {
-            position: relative;
-            overflow: hidden;
-            background: #334155;
-            color: #94a3b8;
-        }
-
-        .btn-file input {
-            position: absolute;
-            top: 0;
-            right: 0;
-            min-width: 100%;
-            min-height: 100%;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .mode-active {
-            border-bottom: 2px solid #3b82f6;
-            color: #fff;
-        }
-
-        #map-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            background: #000;
-        }
-
-        #tooltip {
-            position: absolute;
-            z-index: 1000;
-            pointer-events: none;
-            background: rgba(0, 0, 0, 0.9);
-            border: 1px solid #00ff99;
-            color: #fff;
-            padding: 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            display: none;
-            transform: translate(-50%, -120%);
-            white-space: nowrap;
-        }
-
-        #detail-panel {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 400px;
-            max-height: 85vh;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid #334155;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease;
-            transform: translateY(120%);
-            z-index: 50;
-        }
-
-        #detail-panel.visible {
-            transform: translateY(0);
-        }
-
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 999;
-            display: none;
-            padding: 40px;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-content {
-            background: #1e293b;
-            width: 100%;
-            height: 100%;
-            border-radius: 12px;
-            border: 1px solid #334155;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .modal-inner {
-            padding: 30px;
-            overflow-y: auto;
-            color: #cbd5e1;
-        }
-
-        #loader {
-            position: fixed;
-            inset: 0;
-            background: #0f172a;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #334155;
-            border-top: 4px solid #3b82f6;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .table-row:hover {
-            background: #1e293b;
-            cursor: pointer;
-        }
-
-        .feat-col {
-            color: #34d399;
-            font-family: monospace;
-        }
-
-        .debug-col {
-            color: #f472b6;
-            font-family: monospace;
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 3px;
-        }
-
-        code {
-            background: #0f172a;
-            padding: 2px 4px;
-            border-radius: 4px;
-            font-family: monospace;
-            color: #e2e8f0;
-        }
-    </style>
-    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <script src="https://unpkg.com/deck.gl@^8.8.0/dist.min.js"></script>
-    <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
-    <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+    <link rel="preload" href="/train.bin" as="fetch" crossorigin="anonymous">
+    <link href="birdradar.css" rel="stylesheet" />
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/deck.gl@^8.8.0/dist.min.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js" crossorigin="anonymous"></script>
+    <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js" crossorigin="anonymous"></script>
 </head>
 
 <body class="h-screen flex flex-col">
@@ -261,43 +22,88 @@
     <div id="loader">
         <div class="spinner mb-4"></div>
         <div class="text-blue-400 font-bold text-lg font-mono">BIRD_RADAR_OS</div>
-        <div id="loader-text" class="text-slate-500 text-sm mt-2">Initializing WASM...</div>
+        <div id="loader-text" class="text-slate-500 text-sm mt-2">Initializing System...</div>
     </div>
 
-    <div id="help-modal" class="modal">
-        <div class="modal-content max-w-5xl mx-auto h-auto max-h-[90vh]">
-            <div class="h-16 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-6 shrink-0 z-10">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2">📖 User Manual & Tutorial</h2>
-                <button onclick="document.getElementById('help-modal').style.display='none'" class="text-slate-400 hover:text-white text-3xl">&times;</button>
+    <div id="terms-modal" class="modal" style="z-index: 2000;">
+        <div class="modal-content max-w-2xl mx-auto h-auto shadow-2xl bg-slate-900 border border-red-500/50">
+            <div class="h-16 bg-red-900/20 border-b border-red-900/50 flex items-center justify-between px-6 shrink-0">
+                <h2 class="text-xl font-bold text-red-400 flex items-center gap-2">⚠️ Competition Rules & Terms</h2>
             </div>
-            
+            <div class="modal-inner space-y-4 text-sm leading-relaxed p-8 text-slate-300">
+                <p>You are about to access the <b>Test Set</b> or related features.</p>
+                <p>This dataset is part of the <a
+                        href="https://www.kaggle.com/competitions/ai-cup-2026-performance/rules" target="_blank"
+                        class="text-blue-400 underline">AI Cup 2026</a>. By proceeding, you agree that:</p>
+                <ul class="list-disc pl-5 space-y-2 text-slate-400">
+                    <li>You will use the Test Set solely for the purpose of the competition.</li>
+                    <li>Manual labeling of the test set is strictly prohibited.</li>
+                    <li>You will not reverse engineer or attempt to de-anonymize the data.</li>
+                    <li>You accept the rules of the competition at <a
+                            href="https://www.kaggle.com/competitions/ai-cup-2026-performance/rules" target="_blank"
+                            class="text-blue-400 underline">https://www.kaggle.com/competitions/ai-cup-2026-performance/rules</a></a>
+                    </li>
+                </ul>
+
+                <div class="mt-6 flex items-center gap-2 bg-slate-800 p-3 rounded border border-slate-700">
+                    <input type="checkbox" id="terms-dont-show" class="w-4 h-4 accent-blue-500">
+                    <label for="terms-dont-show" class="text-xs text-slate-400 select-none cursor-pointer">Do not show
+                        this again (I accept the terms)</label>
+                </div>
+            </div>
+            <div class="p-4 bg-slate-800 border-t border-slate-700 flex justify-end gap-3">
+                <button onclick="cancelTerms()" class="btn btn-gray">Cancel</button>
+                <button onclick="acceptTerms()" class="btn btn-red">I Accept & Load Data</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="help-modal" class="modal embed-hidden">
+        <div class="modal-content max-w-5xl mx-auto h-auto max-h-[90vh]">
+            <div
+                class="h-16 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-6 shrink-0 z-10">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">📖 User Manual & Tutorial</h2>
+                <button onclick="document.getElementById('help-modal').style.display='none'"
+                    class="text-slate-400 hover:text-white text-3xl">&times;</button>
+            </div>
+
             <div class="modal-inner space-y-8 text-sm leading-relaxed p-8">
-                
                 <section>
-                    <h3 class="text-blue-400 font-bold text-lg mb-3 border-b border-slate-700 pb-1">1. About This Tool</h3>
+                    <h3 class="text-blue-400 font-bold text-lg mb-3 border-b border-slate-700 pb-1">1. About This Tool
+                    </h3>
                     <p class="text-slate-300 mb-2">
-                        This is an interactive Feature Engineering & Error Analysis tool for the <a href="https://www.teamepoch.ai/ai-cup-2026/challenge-center/" target="_blank" class="text-blue-400 underline hover:text-blue-300">AI Cup 2026: Bird Track Radar Challenge</a>.
+                        This is an interactive Feature Engineering &amp; Error Analysis tool for the <a
+                            href="https://www.teamepoch.ai/ai-cup-2026/challenge-center/" target="_blank"
+                            class="text-blue-400 underline hover:text-blue-300">AI Cup 2026: Bird Track Radar
+                            Challenge</a>.
                     </p>
                     <p class="text-slate-400 text-xs">
-                        The goal is to classify radar tracks into bird species. This tool runs entirely in your browser using <b>WebAssembly (Pyodide)</b>. No data leaves your machine. Python packages auto-install as needed. Github <a href="https://github.com/TeamEpochGithub/aicup-birds-radar-detection-tool" target="_blank" class="text-blue-400 underline hover:text-blue-300">Github page of tool</a>
+                        The goal is to classify radar tracks into bird species. This tool runs entirely in your browser
+                        using <b>WebAssembly (Pyodide)</b>. No data leaves your machine. Python packages auto-install as
+                        needed. Github <a href="https://github.com/TeamEpochGithub/aicup-birds-radar-detection-tool"
+                            target="_blank" class="text-blue-400 underline hover:text-blue-300">Github page of tool</a>
                     </p>
                 </section>
 
                 <section>
-                    <h3 class="text-blue-400 font-bold text-lg mb-3 border-b border-slate-700 pb-1">2. Data & Loading</h3>
+                    <h3 class="text-blue-400 font-bold text-lg mb-3 border-b border-slate-700 pb-1">2. Data &amp;
+                        Loading</h3>
                     <ul class="list-disc pl-5 space-y-1 text-slate-300">
-                        <li><b>Auto-Load:</b> The app tries to fetch <code>train.csv</code> and <code>test.csv</code> automatically (cached in your browser for instant reloads).</li>
+                        <li><b>Auto-Load:</b> The app tries to fetch <code>train.csv</code> and <code>test.csv</code>
+                            automatically (cached in your browser for instant reloads).</li>
                         <li><b>Manual Load:</b> Drag-and-drop your own files via the <b>📂 CSV</b> button.</li>
-                        <li><b>The Data:</b> Each "track" is a sequence of 3D points [Longitude, Latitude, Altitude] plus RCS (Radar Cross Section) recorded over time.</li>
+                        <li><b>The Data:</b> Each "track" is a sequence of 3D points [Longitude, Latitude, Altitude]
+                            plus RCS (Radar Cross Section) recorded over time.</li>
                     </ul>
                 </section>
 
                 <section>
-                    <h3 class="text-blue-400 font-bold text-lg mb-3 border-b border-slate-700 pb-1">3. Feature Calculator (Python)</h3>
+                    <h3 class="text-blue-400 font-bold text-lg mb-3 border-b border-slate-700 pb-1">3. Feature
+                        Calculator (Python)</h3>
                     <p class="mb-4 text-slate-300">
-                        Write Python code in the left sidebar to extract features or filter data. 
+                        Write Python code in the left sidebar to extract features or filter data.
                     </p>
-                    
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="bg-slate-800 p-4 rounded border border-slate-600">
                             <div class="text-xs font-bold text-blue-400 mb-2 uppercase">Available Variables</div>
@@ -312,16 +118,18 @@
                                 </li>
                                 <li>
                                     <div class="font-bold text-white">meta (dict)</div>
-                                    Contains CSV columns: <code>airspeed</code>, <code>radar_bird_size</code>, plus any injected debug columns.
+                                    Contains CSV columns: <code>airspeed</code>, <code>radar_bird_size</code>, plus any
+                                    injected debug columns.
+                                    <br><span class="text-green-400">meta['is_test']</span> is True for test set tracks.
                                 </li>
                             </ul>
                         </div>
-                        
+
                         <div class="bg-slate-800 p-4 rounded border border-slate-600 flex flex-col">
                             <div class="text-xs font-bold text-green-400 mb-2 uppercase">Return Value</div>
-                            <p class="text-xs text-slate-300 mb-2">Your function must return a flat <b>Dictionary</b> of numbers. These become <span class="text-green-400">Green Columns</span> in the Grid.</p>
-                            <pre class="bg-slate-900 p-2 rounded text-[10px] text-green-300 font-mono overflow-x-auto">
-def calculate(coords, times, meta):
+                            <p class="text-xs text-slate-300 mb-2">Your function must return a flat <b>Dictionary</b> of
+                                numbers. These become <span class="text-green-400">Green Columns</span> in the Grid.</p>
+                            <pre class="bg-slate-900 p-2 rounded text-[10px] text-green-300 font-mono overflow-x-auto">def calculate(coords, times, meta):
     import numpy as np
     z = coords[:, 2]
     return {
@@ -334,48 +142,73 @@ def calculate(coords, times, meta):
                 </section>
 
                 <section>
-                    <h3 class="text-blue-400 font-bold text-lg mb-3 border-b border-slate-700 pb-1">4. Submissions & Debugging</h3>
+                    <h3 class="text-blue-400 font-bold text-lg mb-3 border-b border-slate-700 pb-1">4. Submissions &amp;
+                        Debugging</h3>
                     <p class="mb-3 text-slate-300">
-                        Upload your local <code>submission.csv</code> to overlay predictions on the map and calculate mAP (Mean Average Precision).
+                        Upload your local <code>submission.csv</code> to overlay predictions on the map and calculate
+                        mAP (Mean Average Precision).
                     </p>
-                    
-                    <div class="bg-slate-900 p-4 rounded border border-slate-700 font-mono text-xs overflow-x-auto mb-4">
+
+                    <div
+                        class="bg-slate-900 p-4 rounded border border-slate-700 font-mono text-xs overflow-x-auto mb-4">
                         <div class="mb-2 text-slate-500 uppercase font-bold">Standard Format</div>
                         <div class="text-slate-300">track_id, Clutter, Ducks, Geese, ... (probabilities)</div>
-                        
+
                         <div class="mt-4 mb-2 text-pink-400 uppercase font-bold">Debug / Enhanced Format</div>
-                        <div class="text-slate-300">track_id, Clutter, ..., <span class="text-pink-400">cluster_id, embedding_x, local_outlier_factor</span></div>
+                        <div class="text-slate-300">track_id, Clutter, ..., <span class="text-pink-400">cluster_id,
+                                embedding_x, local_outlier_factor</span></div>
                     </div>
 
                     <ul class="list-disc pl-5 space-y-2 text-slate-300 text-xs">
-                        <li><b>Debug Columns:</b> Any extra columns in your submission file are automatically detected as <span class="text-pink-400 font-bold">Pink Columns</span> in the Grid View.</li>
-                        <li>These values are injected into the <code>meta</code> dictionary (e.g., <code>meta['cluster_id']</code>), allowing you to visualize your local training pipeline's internal state.</li>
-                        <li><b>Test Set:</b> Since ground truth is unknown for the test set, uploading a submission allows the tool to use your <b>Predicted Class</b> as the label for visualization and filtering.</li>
+                        <li><b>Important:</b> The <code>submission.csv</code> you upload here can be a <b>Superset</b>
+                            of the Kaggle submission. It can contain tracks from <code>train.csv</code> (for local
+                            hold-out validation) and does not need to be limited to just the test set.</li>
+                        <li><b>Debug Columns:</b> Any extra columns in your submission file are automatically detected
+                            as <span class="text-pink-400 font-bold">Pink Columns</span> in the Grid View. Debug columns
+                            are <b>invalid</b> for kaggle submissions.</li>
+                        <li>These values are injected into the <code>meta</code> dictionary (e.g.,
+                            <code>meta['cluster_id']</code>), allowing you to visualize your local training pipeline's
+                            internal state.
+                        </li>
+                        <li><b>Test Set:</b> Since ground truth is unknown for the test set, uploading a submission
+                            allows the tool to use your <b>Predicted Class</b> as the label for visualization and
+                            filtering.</li>
+                        <li><i>TIP: generate two submission files from your pipeline: 1. for kaggle and 2 that contains
+                                train and debug info for the bird radar site.</i></li>
                     </ul>
                 </section>
 
                 <section>
-                    <h3 class="text-blue-400 font-bold text-lg mb-3 border-b border-slate-700 pb-1">5. Statistics Lab (📊)</h3>
+                    <h3 class="text-blue-400 font-bold text-lg mb-3 border-b border-slate-700 pb-1">5. Statistics Lab
+                        (📊)</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300">
                         <div>
                             <b class="text-white block mb-1">Class Boxplots</b>
-                            Runs your Python feature calculator against the entire dataset and plots distribution boxplots for every returned feature, grouped by Bird Species. Useful for finding features that separate classes well.
+                            Runs your Python feature calculator against the entire dataset and plots distribution
+                            boxplots for every returned feature, grouped by Bird Species. Useful for finding features
+                            that separate classes well.
                         </div>
                         <div>
                             <b class="text-white block mb-1">Train/Test Overlap</b>
-                            Plots histograms comparing the distribution of your features in Train vs. Test sets. Crucial for detecting <b>Covariate Shift</b> (e.g., finding if test birds fly higher/slower than training birds).
+                            Plots histograms comparing the distribution of your features in Train vs. Test sets. Crucial
+                            for detecting <b>Covariate Shift</b> (e.g., finding if test birds fly higher/slower than
+                            training birds).
                         </div>
                     </div>
                 </section>
+            </div>
 
+            <div class="p-4 bg-slate-800 border-t border-slate-700 flex justify-end">
+                <button onclick="closeTutorialForever()" class="btn btn-blue">Don't show again</button>
             </div>
         </div>
     </div>
 
-    <div id="stats-modal" class="modal">
-        <div id="stats-content" class="relative flex flex-col w-full h-full bg-slate-900 rounded-xl border border-slate-700 overflow-hidden">
-            
-            <div class="h-14 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-6 shrink-0 z-10">
+    <div id="stats-modal" class="modal embed-hidden">
+        <div id="stats-content"
+            class="relative flex flex-col w-full h-full bg-slate-900 rounded-xl border border-slate-700 overflow-hidden">
+            <div
+                class="h-14 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-6 shrink-0 z-10">
                 <div class="flex items-center gap-4">
                     <h2 class="text-lg font-bold text-white">📊 Statistics Lab</h2>
                     <div class="flex bg-slate-900 rounded p-1">
@@ -383,44 +216,48 @@ def calculate(coords, times, meta):
                         <div class="w-2"></div>
                         <button onclick="runStats('overlap')" class="btn btn-blue">Train/Test Overlap</button>
                     </div>
+                    <span id="stats-filter-notice" class="text-xs text-orange-400 hidden">(Using Filtered Data)</span>
                 </div>
-                <button onclick="document.getElementById('stats-modal').style.display='none'" class="text-slate-400 hover:text-white text-2xl">&times;</button>
+                <button onclick="document.getElementById('stats-modal').style.display='none'"
+                    class="text-slate-400 hover:text-white text-2xl">&times;</button>
             </div>
-            
             <div class="absolute top-14 bottom-0 left-0 right-0 overflow-y-auto p-4 bg-slate-900">
                 <div id="stats-charts" class="grid grid-cols-2 gap-6 pb-10">
                     <div class="col-span-2 text-center text-slate-500 mt-20 italic">Select a mode above...</div>
                 </div>
             </div>
-            
         </div>
     </div>
 
     <header class="h-14 bg-slate-900 border-b border-slate-700 flex items-center justify-between px-4 shrink-0 z-20">
         <div class="flex items-center gap-4">
-            <h1 class="text-xl font-bold text-blue-400">Bird track radar</h1>
+            <button onclick="toggleSidebar()" class="btn btn-gray w-8 text-lg font-bold embed-hidden"
+                title="Toggle Sidebar">≡</button>
+            <h1 class="text-xl font-bold text-blue-400 whitespace-nowrap">Bird track radar</h1>
 
-            <div class="flex items-center bg-slate-800 rounded p-1 border border-slate-600 gap-2">
+            <div class="flex items-center bg-slate-800 rounded p-1 border border-slate-600 gap-2 embed-hidden">
                 <select id="dataset-select" class="bg-transparent text-sm text-slate-300 outline-none px-2"
                     onchange="switchDataset()">
                     <option value="train">Train Set</option>
                     <option value="test">Test Set</option>
                 </select>
-                <div class="h-4 w-px bg-slate-600"></div>
-                <div class="btn-file btn text-[10px]"><span>📂 Upload train/test CSV</span><input type="file" accept=".csv"
-                        onchange="handleFileUpload(this, 'data')"></div>
-                <div class="btn-file btn text-[10px]"><span>📤 Upload submission.</span><input type="file" accept=".csv"
-                        onchange="handleFileUpload(this, 'sub')"></div>
+                <div class="h-4 w-px bg-slate-600 desktop-only"></div>
+                <div class="btn-file btn text-[10px] desktop-only"><span>📂 Upload CSV</span><input type="file"
+                        accept=".csv" onchange="handleFileUpload(this, 'data')"></div>
+                <div class="btn-file btn text-[10px] desktop-only"><span>📤 Submission</span><input type="file"
+                        accept=".csv" onchange="handleFileUpload(this, 'sub')"></div>
+                <div class="btn btn-purple text-[10px] desktop-only" onclick="loadSampleSubmission()"><span>📄
+                        Introduction Notebook Submission</span></div>
 
                 <div id="filter-status"
-                    class="hidden px-3 py-1 bg-orange-900/50 border border-orange-700 text-orange-200 text-xs rounded flex items-center gap-2">
-                    <span>Filter Active (<span id="filter-count">0</span>)</span>
-                    <button onclick="clearFilter()" class="text-orange-400 hover:text-white font-bold">×</button>
+                    class="hidden px-3 py-1 bg-slate-700 border border-slate-600 text-slate-200 text-xs rounded flex items-center gap-2">
+                    <span id="filter-badges" class="flex gap-2"></span>
+                    <button onclick="clearFilter()" class="text-slate-400 hover:text-white font-bold ml-1">×</button>
                 </div>
             </div>
 
             <div id="sub-filter-container"
-                class="hidden flex items-center gap-2 px-3 py-1 bg-slate-800 border border-slate-600 rounded">
+                class="hidden flex items-center gap-2 px-3 py-1 bg-slate-800 border border-slate-600 rounded embed-hidden">
                 <input type="checkbox" id="limit-to-sub" onchange="applySimpleFilters()"
                     class="w-3 h-3 accent-purple-500">
                 <label for="limit-to-sub" class="text-[10px] text-slate-400 font-bold uppercase cursor-pointer">Only
@@ -428,33 +265,43 @@ def calculate(coords, times, meta):
             </div>
 
             <div id="score-status"
-                class="hidden px-3 py-1 bg-purple-900/50 border border-purple-700 text-purple-200 text-xs rounded">
+                class="hidden px-3 py-1 bg-purple-900/50 border border-purple-700 text-purple-200 text-xs rounded embed-hidden">
                 mAP: <span id="mAP-val" class="font-bold">0.000</span>
             </div>
+
+            <div id="embed-controls" class="hidden flex gap-2">
+                <button onclick="window.open(window.location.href, '_blank')" class="btn btn-blue text-xs">⤢
+                    Fullscreen</button>
+            </div>
         </div>
+
         <div class="flex items-center gap-3">
             <button onclick="document.getElementById('help-modal').style.display='block'"
-                class="btn btn-gray w-8 h-8 flex items-center justify-center rounded-full text-lg font-bold">?</button>
-            <button onclick="document.getElementById('stats-modal').style.display='block'" class="btn btn-purple">📊
+                class="btn btn-gray w-8 h-8 flex items-center justify-center rounded-full text-lg font-bold embed-hidden">?</button>
+            <button onclick="document.getElementById('stats-modal').style.display='block'"
+                class="btn btn-purple embed-hidden desktop-only">📊
                 Stats</button>
-            <div class="h-6 w-px bg-slate-700"></div>
-            <div class="flex bg-slate-800 p-1 rounded border border-slate-600">
+            <div class="h-6 w-px bg-slate-700 embed-hidden"></div>
+            <div class="flex bg-slate-800 p-1 rounded border border-slate-600 embed-hidden">
                 <button onclick="setView('map')" id="btn-view-map" class="btn bg-slate-700 text-white">Map</button>
                 <button onclick="setView('table')" id="btn-view-table" class="btn text-slate-400">Grid</button>
             </div>
-            <button onclick="setMapStyle('dark')" id="btn-style-dark"
-                class="btn bg-slate-700 text-white">Schematic</button>
+            <button onclick="setMapStyle('dark')" id="btn-style-dark" class="btn bg-slate-700 text-white">Light</button>
             <button onclick="setMapStyle('satellite')" id="btn-style-sat"
                 class="btn bg-slate-800 text-slate-400">Satellite</button>
         </div>
     </header>
 
     <div class="flex-1 flex overflow-hidden relative">
-        <aside class="w-1/3 min-w-[400px] flex flex-col border-r border-slate-700 bg-slate-800 z-10">
-            <div class="p-3 border-b border-slate-700 flex gap-2">
+        <aside id="sidebar"
+            class="w-1/3 min-w-[350px] flex flex-col border-r border-slate-700 bg-slate-800 z-10 embed-hidden">
+            <div class="p-3 border-b border-slate-700 flex gap-2 flex-wrap">
                 <input id="search-id" type="text" placeholder="Search ID..."
-                    class="flex-1 bg-slate-900 border border-slate-600 rounded px-3 py-1 text-sm text-white outline-none focus:border-blue-500">
+                    class="flex-1 bg-slate-900 border border-slate-600 rounded px-3 py-1 text-sm text-white outline-none focus:border-blue-500 min-w-[80px]">
                 <select id="search-class"
+                    class="flex-1 bg-slate-900 border border-slate-600 rounded px-3 py-1 text-sm text-white outline-none"
+                    onchange="applySimpleFilters()"></select>
+                <select id="search-day"
                     class="flex-1 bg-slate-900 border border-slate-600 rounded px-3 py-1 text-sm text-white outline-none"
                     onchange="applySimpleFilters()"></select>
                 <button onclick="applySimpleFilters()" class="btn btn-blue">Filter</button>
@@ -487,8 +334,16 @@ def calculate(coords, times, meta):
                 id="console-output"></div>
         </aside>
 
+        <div class="absolute top-2 left-2 z-20 bg-slate-800/90 backdrop-blur rounded p-2 border border-slate-600 hidden"
+            id="embed-filter-overlay">
+            <select id="embed-search-class"
+                class="bg-slate-900 border border-slate-600 rounded px-3 py-1 text-sm text-white outline-none"
+                onchange="document.getElementById('search-class').value = this.value; applySimpleFilters();">
+            </select>
+        </div>
+
         <main class="flex-1 relative bg-slate-950">
-            <div id="map-view" class="w-full h-full">
+            <div id="map-view" class="w-full h-full" oncontextmenu="return false;">
                 <div id="map-container"></div>
                 <div id="tooltip"></div>
             </div>
@@ -497,13 +352,7 @@ def calculate(coords, times, meta):
                 <div class="flex-1 overflow-auto p-4">
                     <table class="w-full text-left text-[11px] border-separate border-spacing-y-1">
                         <thead class="sticky top-0 bg-slate-800 z-10 shadow-lg">
-                            <tr id="table-head">
-                                <th class="p-3 rounded-l-md">Track ID</th>
-                                <th class="p-3">Truth</th>
-                                <th class="p-3">Prediction</th>
-                                <th class="p-3 text-center">Pts</th>
-                                <th class="p-3 text-center">V_Air</th>
-                            </tr>
+                            <tr id="table-head"></tr>
                         </thead>
                         <tbody id="table-body"></tbody>
                     </table>
@@ -525,9 +374,13 @@ def calculate(coords, times, meta):
                         <span class="text-xs font-bold text-blue-400 uppercase">Analysis</span>
                         <span id="detail-id" class="text-xs font-mono text-white select-all"></span>
                     </div>
-                    <button onclick="closeDetail()" class="text-slate-400 hover:text-white text-xl">&times;</button>
+                    <div class="flex items-center gap-2">
+                        <button onclick="toggleMaximize()" class="text-slate-400 hover:text-white"
+                            title="Maximize/Restore">[ ]</button>
+                        <button onclick="closeDetail()" class="text-slate-400 hover:text-white text-xl">&times;</button>
+                    </div>
                 </div>
-                <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                <div id="detail-content-wrapper" class="flex-1 overflow-y-auto p-4 space-y-4">
                     <div id="detail-meta-area" class="space-y-2">
                         <div id="detail-meta" class="text-xs text-slate-300"></div>
                         <div id="detail-sub"
@@ -535,7 +388,11 @@ def calculate(coords, times, meta):
                     </div>
                     <div id="detail-plot" class="h-56 bg-slate-900 rounded-lg border border-slate-700 relative"></div>
                     <div class="border-t border-slate-700 pt-3">
-                        <div class="text-[10px] text-blue-400 uppercase font-bold mb-2">Engine Output</div>
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="text-[10px] text-blue-400 uppercase font-bold">Engine Output</div>
+                            <button id="btn-update-detail" onclick="runFeatureCalcForSelected()"
+                                class="hidden btn btn-green text-[10px] py-0">Update</button>
+                        </div>
                         <div id="detail-features" class="text-[11px] font-mono text-slate-300 space-y-1">
                             <span class="text-slate-600 italic">No features calculated yet.</span>
                         </div>
@@ -545,534 +402,7 @@ def calculate(coords, times, meta):
         </main>
     </div>
 
-    <script>
-        const { DeckGL, PathLayer, TileLayer, BitmapLayer } = deck;
-        const BIRD_GROUPS = ["Clutter", "Cormorants", "Pigeons", "Ducks", "Geese", "Gulls", "Birds of Prey", "Waders", "Songbirds"];
-
-        const TEMPLATES = {
-            feature: `import numpy as np\n\ndef calculate(coords, times, meta):
-    z = coords[:, 2]
-    rcs = coords[:, 3]
-    
-    return {
-        "min_z": float(np.min(z)),
-        "max_z": float(np.max(z)),
-        "pts": len(coords),
-        "mean_rcs": float(np.mean(rcs)),
-        "airspeed": meta.get("airspeed", 0),
-        "radar_bird_size": meta.get("radar_bird_size", 0),
-        "timestamp_start_radar_utc": meta.get("timestamp_start_radar_utc", ""),
-        "timestamp_end_radar_utc": meta.get("timestamp_end_radar_utc", "")
-    }`,
-            filter: `def filter(coords, times, meta):
-    import numpy as np
-
-    return np.mean(coords[:, 3]) < -30`
-        };
-
-        let PYODIDE = null, MICROPIP = null;
-        let RAW_DATA = { train: [], test: [] }, SUBMISSION = {}, ACTIVE_DATA = [];
-        let DECK = null, MAP_STYLE = 'dark', EDITOR_MODE = 'feature', SELECTED_ID = null, VIEW_MODE = 'map';
-        let TABLE_PAGE = 0, TABLE_LIMIT = 50, CUSTOM_COLS = [], DEBUG_COLS = [];
-
-        const editor = ace.edit("editor");
-        editor.setTheme("ace/theme/twilight");
-        editor.session.setMode("ace/mode/python");
-
-        editor.setValue(localStorage.getItem('bd_code_feature') || TEMPLATES.feature, -1);
-        editor.on('change', () => {
-            if (EDITOR_MODE === 'feature') localStorage.setItem('bd_code_feature', editor.getValue());
-            else localStorage.setItem('bd_code_filter', editor.getValue());
-        });
-
-        function parseWkbHex(hex) {
-            if (!hex) return [];
-            hex = hex.replace(/^0x|^\\x/i, '');
-            const buffer = new Uint8Array(hex.match(/[\da-f]{2}/gi).map(h => parseInt(h, 16))).buffer;
-            const view = new DataView(buffer);
-            let offset = 0;
-            const le = (view.getUint8(offset) === 1); offset += 1;
-            const typeUint = view.getUint32(offset, le); offset += 4;
-            const hasZ = (typeUint & 0x80000000) !== 0, hasM = (typeUint & 0x40000000) !== 0, hasSRID = (typeUint & 0x20000000) !== 0;
-            if (hasSRID) offset += 4;
-            const numPoints = view.getUint32(offset, le); offset += 4;
-            const coords = [];
-            for (let i = 0; i < numPoints; i++) {
-                if (offset + 16 > buffer.byteLength) break;
-                const x = view.getFloat64(offset, le); offset += 8;
-                const y = view.getFloat64(offset, le); offset += 8;
-                let z = 0, m = 0;
-                if (hasZ) { z = view.getFloat64(offset, le); offset += 8; }
-                if (hasM) { m = view.getFloat64(offset, le); offset += 8; }
-                coords.push([x, y, z, m]);
-            }
-            return coords;
-        }
-
-        async function init() {
-            try {
-                document.getElementById('search-class').innerHTML = '<option value="">All Classes</option>' + BIRD_GROUPS.map(g => `<option value="${g}">${g}</option>`).join('');
-                PYODIDE = await loadPyodide({ stdout: (t) => log(t, "text-slate-300"), stderr: (t) => log(t, "text-red-400") });
-                await PYODIDE.loadPackage(["numpy", "scipy", "pandas", "micropip"]);
-                MICROPIP = PYODIDE.pyimport("micropip");
-                initMap();
-                loadCSV('train').catch(e => log(`Train Error: ${e}`, 'text-red-400'));
-                loadCSV('test').catch(e => log(`Test Error: ${e}`, 'text-red-400'));
-                document.getElementById('loader').style.opacity = '0';
-                setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
-            } catch (e) { document.getElementById('loader-text').innerHTML = `<span class="text-red-400">${e.message}</span>`; }
-        }
-
-        function handleFileUpload(input, type) {
-            const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => type === 'data' ? parseCSVContent(e.target.result, document.getElementById('dataset-select').value) : parseSubmission(e.target.result);
-            reader.readAsText(file);
-        }
-
-        async function loadCSV(type) {
-            try {
-                const res = await fetch(`${type}.csv`);
-                if (!res.ok) throw new Error(`${res.status}`);
-                const text = await res.text();
-                parseCSVContent(text, type);
-            } catch (e) { throw e; }
-        }
-
-        function parseCSVContent(text, type) {
-            Papa.parse(text, {
-                header: true, skipEmptyLines: true, complete: (results) => {
-                    const rows = [];
-                    results.data.forEach(row => {
-                        const coords = parseWkbHex(row['trajectory']);
-                        if (!coords || coords.length < 2) return; // Strict safety check
-
-                        let times = [];
-                        try { times = JSON.parse(row['trajectory_time'].replace(/'/g, '"')); } catch (e) { times = coords.map((_, k) => k); }
-                        rows.push({
-                            id: row['track_id'],
-                            group: type === 'test' ? 'Test Set' : (row['bird_group'] || 'Unknown'),
-                            coords: coords, times: times, calculated: {},
-                            meta: {
-                                ...row,
-                                airspeed: parseFloat(row['airspeed']) || 0,
-                                timestamp_start_radar_utc: row['timestamp_start_radar_utc'],
-                                min_z: parseFloat(row['min_z']) || 0,
-                                max_z: parseFloat(row['max_z']) || 0
-                            }
-                        });
-                    });
-                    RAW_DATA[type] = rows;
-                    log(`Loaded ${rows.length} ${type} tracks`, "text-green-400");
-                    applySimpleFilters();
-                }
-            });
-        }
-
-        function parseSubmission(text) {
-            Papa.parse(text, {
-                header: true, skipEmptyLines: true, complete: (results) => {
-                    SUBMISSION = {};
-                    const headers = results.meta.fields;
-                    DEBUG_COLS = headers.filter(h => h !== 'track_id' && !BIRD_GROUPS.includes(h));
-                    results.data.forEach(row => {
-                        const tid = row['track_id'];
-                        if (!tid) return;
-                        const scores = {};
-                        BIRD_GROUPS.forEach(g => scores[g] = parseFloat(row[g]) || 0);
-                        const debugVals = {};
-                        DEBUG_COLS.forEach(c => { const val = parseFloat(row[c]); debugVals[c] = isNaN(val) ? row[c] : val; });
-                        SUBMISSION[tid] = { scores: scores, debug: debugVals };
-                    });
-                    ['train', 'test'].forEach(ds => {
-                        if (RAW_DATA[ds]) RAW_DATA[ds].forEach(t => { if (SUBMISSION[t.id]) t.meta = { ...t.meta, ...SUBMISSION[t.id].debug }; });
-                    });
-                    document.getElementById('sub-filter-container').classList.remove('hidden');
-                    log(`Submission loaded: ${Object.keys(SUBMISSION).length} entries. Found ${DEBUG_COLS.length} debug columns.`, "text-purple-400");
-                    if (document.getElementById('dataset-select').value === 'train') calculateScore();
-                    applySimpleFilters();
-                }
-            });
-        }
-
-        async function calculateScore() {
-            const train = RAW_DATA.train.filter(d => SUBMISSION[d.id]);
-            if (train.length === 0) return;
-            try {
-                const y_true = train.map(d => BIRD_GROUPS.indexOf(d.group));
-                const y_score = train.map(d => BIRD_GROUPS.map(g => SUBMISSION[d.id].scores[g]));
-                PYODIDE.globals.set("y_true", PYODIDE.toPy(y_true));
-                PYODIDE.globals.set("y_score", PYODIDE.toPy(y_score));
-                const mAP = await PYODIDE.runPythonAsync(`
-from sklearn.metrics import average_precision_score
-import numpy as np
-y_t, y_s = np.array(y_true), np.array(y_score)
-aps = [average_precision_score((y_t == i).astype(int), y_s[:, i]) for i in range(${BIRD_GROUPS.length}) if np.sum(y_t == i) > 0]
-float(np.mean(aps)) if aps else 0.0`);
-                document.getElementById('score-status').classList.remove('hidden');
-                document.getElementById('mAP-val').innerText = mAP.toFixed(4);
-            } catch (e) { console.error(e); }
-        }
-
-        function applySimpleFilters() {
-            const ds = document.getElementById('dataset-select').value;
-            const sid = document.getElementById('search-id').value;
-            const scls = document.getElementById('search-class').value;
-            const onlySub = document.getElementById('limit-to-sub').checked;
-
-            if (!RAW_DATA[ds]) { ACTIVE_DATA = []; renderView(); return; }
-
-            ACTIVE_DATA = RAW_DATA[ds].filter(d => {
-                const hasSub = SUBMISSION[d.id] !== undefined;
-                if (onlySub && !hasSub) return false;
-                if (sid && !d.id.includes(sid)) return false;
-
-                let effectiveGroup = d.group;
-                if (ds === 'test' && hasSub) {
-                    const scores = SUBMISSION[d.id].scores;
-                    const top = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
-                    effectiveGroup = top[0];
-                    d.predictedGroup = effectiveGroup;
-                }
-                if (scls && effectiveGroup !== scls) return false;
-                return true;
-            });
-
-            TABLE_PAGE = 0;
-            renderView();
-            log(`Showing ${ACTIVE_DATA.length} tracks`);
-        }
-
-        async function runBatchInPyodide(batch, mode) {
-            if (!PYODIDE) return [];
-            const funcName = mode === 'filter' ? 'filter' : 'calculate';
-
-            const code = editor.getValue();
-            await checkAndInstallImports(code);
-            await PYODIDE.runPythonAsync(code);
-
-            await PYODIDE.runPythonAsync(`
-import numpy as np
-import json
-import traceback
-import gc
-
-def _batch_runner(tracks, mode):
-    results = []
-    func = globals().get(mode)
-    if not func: return []
-
-    for t in tracks:
-        # MEMORY SAFE: Convert one by one and delete
-        try:
-            c = np.array([list(coord) for coord in list(t.coords)])
-            if c.ndim != 2: raise ValueError("Invalid coords dims")
-            
-            tm = np.array(list(t.times))
-            m = t.meta.to_py()
-            
-            res = func(c, tm, m)
-            if mode == 'filter': res = bool(res)
-            results.append(res)
-            
-            # Explicitly clear vars to help WASM GC
-            del c, tm, m
-        except Exception as e:
-            results.append(None)
-            traceback.print_exc()
-            print(f"Error in track {t.id}: {e}")
-            
-    # GC periodically in batch
-    gc.collect()
-    return json.dumps(results)
-        `);
-
-            PYODIDE.globals.set("batch_proxy", batch);
-            const jsonRes = await PYODIDE.runPythonAsync(`_batch_runner(batch_proxy, '${funcName}')`);
-            return JSON.parse(jsonRes);
-        }
-
-        async function runStats(mode) {
-            if (!PYODIDE) return;
-            const container = document.getElementById('stats-charts');
-            container.innerHTML = `<div class="col-span-2 text-center text-slate-400">Processing massive data... please wait...</div>`;
-
-            const processAll = async (dataList) => {
-                const results = {};
-                const CHUNK_SIZE = 50; // VERY SAFE CHUNK SIZE to prevent OOM
-                for (let i = 0; i < dataList.length; i += CHUNK_SIZE) {
-                    const chunk = dataList.slice(i, i + CHUNK_SIZE);
-                    const calcResults = await runBatchInPyodide(chunk, 'calculate');
-                    calcResults.forEach((res, idx) => {
-                        if (!res) return;
-                        const track = chunk[idx];
-                        for (const [k, v] of Object.entries(res)) {
-                            if (typeof v === 'number') {
-                                if (!results[k]) results[k] = [];
-                                results[k].push({ val: v, group: track.predictedGroup || track.group });
-                            }
-                        }
-                    });
-                }
-                return results;
-            };
-
-            if (mode === 'class') {
-                const data = RAW_DATA.train.length > 0 ? RAW_DATA.train : RAW_DATA.test;
-                const metrics = await processAll(data.slice(0, 1000));
-                container.innerHTML = '';
-                for (const [feat, values] of Object.entries(metrics)) {
-                    const div = document.createElement('div');
-                    div.className = "bg-slate-800 p-2 rounded h-80 border border-slate-700";
-                    container.appendChild(div);
-                    const traces = [];
-                    const grouped = {};
-                    values.forEach(v => { if (!grouped[v.group]) grouped[v.group] = []; grouped[v.group].push(v.val); });
-                    for (const [g, vals] of Object.entries(grouped)) traces.push({ y: vals, type: 'box', name: g, boxpoints: false });
-
-                    Plotly.newPlot(div, traces, { title: { text: feat, font: { color: '#e2e8f0', size: 12 } }, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', font: { color: '#94a3b8' }, margin: { t: 40, b: 40, l: 40, r: 10 }, showlegend: false, autosize: true }, { displayModeBar: false, responsive: true });
-                }
-                // Trigger a resize after appending content to ensure charts fit
-                setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 100);
-
-            } else if (mode === 'overlap') {
-                const trainRes = await processAll(RAW_DATA.train.slice(0, 500));
-                const testRes = await processAll(RAW_DATA.test.slice(0, 500));
-                container.innerHTML = '';
-                const keys = Object.keys(trainRes).filter(k => testRes[k]);
-                for (const k of keys) {
-                    const div = document.createElement('div');
-                    div.className = "bg-slate-800 p-2 rounded h-80 border border-slate-700";
-                    container.appendChild(div);
-                    const tVals = trainRes[k].map(v => v.val);
-                    const sVals = testRes[k].map(v => v.val);
-                    const traces = [{ x: tVals, type: 'histogram', name: 'Train', opacity: 0.5, marker: { color: 'blue' } }, { x: sVals, type: 'histogram', name: 'Test', opacity: 0.5, marker: { color: 'red' } }];
-
-                    Plotly.newPlot(div, traces, { title: { text: k, font: { color: '#e2e8f0', size: 12 } }, barmode: "overlay", paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', font: { color: '#94a3b8' }, margin: { t: 40, b: 40, l: 40, r: 10 }, legend: { x: 1, xanchor: 'right', y: 1 }, autosize: true }, { displayModeBar: false, responsive: true });
-                }
-                // Trigger a resize
-                setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 100);
-            }
-        }
-
-        function initMap() {
-            DECK = new DeckGL({ container: 'map-container', initialViewState: { latitude: 53.44, longitude: 6.84, zoom: 11, pitch: 50, bearing: 0 }, controller: true, layers: [getBaseMap(), getPathLayer()] });
-        }
-
-        function getBaseMap() {
-            const url = MAP_STYLE === 'dark' ? 'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png' : 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-            return new TileLayer({ id: 'base-tiles', data: url, minZoom: 0, maxZoom: 19, tileSize: 256, renderSubLayers: props => new BitmapLayer(props, { data: null, image: props.data, bounds: [props.tile.bbox.west, props.tile.bbox.south, props.tile.bbox.east, props.tile.bbox.north] }) });
-        }
-
-        function getPathLayer() {
-            return new PathLayer({
-                id: 'tracks', data: ACTIVE_DATA.slice(0, 2000), pickable: true, widthScale: 1, widthMinPixels: 2,
-                getPath: d => d.coords.map(c => [c[0], c[1], c[2]]),
-                getColor: d => d.id === SELECTED_ID ? [0, 255, 150, 255] : (d.coords[0][2] < 50 ? [0, 170, 255, 180] : (d.coords[0][2] < 200 ? [255, 170, 0, 180] : [255, 0, 85, 180])),
-                getWidth: d => d.id === SELECTED_ID ? 8 : 3,
-                rounded: true, onClick: i => selectTrack(i.object), onHover: i => {
-                    const tt = document.getElementById('tooltip');
-                    if (i.object) {
-                        const groupName = (i.object.group === 'Test Set' && i.object.predictedGroup) ? `Pred: ${i.object.predictedGroup}` : i.object.group;
-                        tt.style.display = 'block'; tt.style.left = i.x + 'px'; tt.style.top = i.y + 'px';
-                        tt.innerHTML = `<div class="font-bold">${groupName}</div>ID: ${i.object.id}`;
-                    } else tt.style.display = 'none';
-                },
-                updateTriggers: { getColor: [SELECTED_ID], getWidth: [SELECTED_ID] }
-            });
-        }
-
-        function selectTrack(track) {
-            if (!track) { closeDetail(); return; }
-            SELECTED_ID = track.id;
-            if (VIEW_MODE === 'map') DECK.setProps({ layers: [getBaseMap(), getPathLayer()] });
-            document.getElementById('detail-panel').classList.add('visible');
-            document.getElementById('detail-id').innerText = track.id;
-
-            const predArea = document.getElementById('detail-sub');
-            if (SUBMISSION[track.id]) {
-                const scores = Object.entries(SUBMISSION[track.id].scores).sort((a, b) => b[1] - a[1]);
-                let html = `<div class="font-bold border-b border-slate-600 mb-1 pb-1">Probabilities</div>`;
-                scores.forEach(([cls, score]) => {
-                    const percent = (score * 100).toFixed(1);
-                    html += `<div class="flex justify-between items-center text-[10px]">
-                    <span class="w-24 truncate">${cls}</span>
-                    <div class="flex-1 flex items-center justify-end">
-                        <span class="mr-2 ${score > 0.5 ? 'text-green-400 font-bold' : 'text-slate-400'}">${percent}%</span>
-                        <div class="w-12 h-1 bg-slate-700 rounded overflow-hidden"><div class="h-full bg-purple-500" style="width:${percent}%"></div></div>
-                    </div>
-                </div>`;
-                });
-                predArea.innerHTML = html;
-                predArea.classList.remove('hidden');
-            } else predArea.classList.add('hidden');
-
-            document.getElementById('detail-meta').innerHTML = `Truth: <b class="text-white">${track.group}</b> | V_Air: ${track.meta.airspeed.toFixed(1)} m/s`;
-
-            const c0 = track.coords[0];
-            Plotly.newPlot('detail-plot', [{
-                type: 'scatter3d', mode: 'lines+markers',
-                x: track.coords.map(c => (c[0] - c0[0]) * 111139 * Math.cos(c0[1] * Math.PI / 180)),
-                y: track.coords.map(c => (c[1] - c0[1]) * 111139),
-                z: track.coords.map(c => c[2]),
-                line: { width: 4, color: '#3b82f6' }, marker: { size: 2, color: track.coords.map(c => c[3]), colorscale: 'Viridis' },
-                hovertemplate: 'X: %{x:.1f}m<br>Y: %{y:.1f}m<br>Z: %{z:.1f}m<br>RCS: %{marker.color:.1f} dB<extra></extra>' 
-            }], {
-                margin: { t: 0, b: 0, l: 0, r: 0 }, paper_bgcolor: 'rgba(0,0,0,0)',
-                scene: { xaxis: { title: 'X(m)', color: '#94a3b8', gridcolor: '#334155' }, yaxis: { title: 'Y(m)', color: '#94a3b8', gridcolor: '#334155' }, zaxis: { title: 'Z(m)', color: '#94a3b8', gridcolor: '#334155' }, aspectmode: 'data', camera: { eye: { x: 1.5, y: 1.5, z: 0.5 } } }
-            }, { displayModeBar: false });
-
-            // --- FIX FOR 3D PLOT RESIZING BUG ---
-            setTimeout(() => {
-                const p = document.getElementById('detail-plot');
-                if (p) Plotly.Plots.resize(p);
-            }, 50);
-
-            runFeatureCalcForSelected();
-        }
-
-        async function checkAndInstallImports(code) {
-            if (!MICROPIP) return;
-            const packages = [...code.matchAll(/^\s*(?:import|from)\s+([a-zA-Z0-9_\-]+)/gm)].map(m => m[1]);
-            for (let pkg of packages) {
-                if (['math', 'json', 'numpy', 'pandas', 'scipy', 'os', 'sys'].includes(pkg)) continue;
-                try { await PYODIDE.runPythonAsync(`import ${pkg}`); } catch (e) { try { await MICROPIP.install(pkg); } catch (err) { } }
-            }
-        }
-
-        async function runFeatureCalcOnPage() {
-            if (!PYODIDE) return;
-            const start = TABLE_PAGE * TABLE_LIMIT;
-            const tracks = ACTIVE_DATA.slice(start, start + TABLE_LIMIT);
-            log(`Processing batch of ${tracks.length}...`);
-
-            try {
-                const results = await runBatchInPyodide(tracks, 'calculate');
-                results.forEach((res, i) => { if (res) tracks[i].calculated = res; });
-                if (tracks.length > 0) CUSTOM_COLS = Object.keys(tracks[0].calculated).filter(k => typeof tracks[0].calculated[k] !== 'object');
-                renderView();
-                log("Computation finished.", "text-green-400");
-            } catch (e) { log(e.message, "text-red-400"); }
-        }
-
-        async function runFeatureCalcForSelected() {
-            if (!SELECTED_ID || !PYODIDE) return;
-            const track = ACTIVE_DATA.find(d => d.id === SELECTED_ID);
-            try {
-                // Re-use batch logic for single item
-                const results = await runBatchInPyodide([track], 'calculate');
-                if (results[0]) {
-                    track.calculated = results[0];
-                    let html = '';
-                    for (const [k, v] of Object.entries(track.calculated)) {
-                        if (typeof v === 'object') continue;
-                        html += `<div class="flex justify-between border-b border-slate-700/50"><span>${k}</span><span class="text-white font-mono">${(typeof v === 'number' ? v.toFixed(3) : v)}</span></div>`;
-                    }
-                    document.getElementById('detail-features').innerHTML = html;
-                }
-            } catch (e) { document.getElementById('detail-features').innerHTML = `<span class="text-red-400 text-[10px]">${e.message}</span>`; }
-        }
-
-        async function runPythonFilter() {
-            if (!PYODIDE) return;
-            log("Running global filter (Batched)...");
-            try {
-                const source = RAW_DATA[document.getElementById('dataset-select').value];
-                const CHUNK_SIZE = 1000;
-                const valid = [];
-
-                const processSource = source.slice(0, 4000);
-
-                for (let i = 0; i < processSource.length; i += CHUNK_SIZE) {
-                    const chunk = processSource.slice(i, i + CHUNK_SIZE);
-                    const results = await runBatchInPyodide(chunk, 'filter');
-                    results.forEach((keep, idx) => { if (keep) valid.push(chunk[idx]); });
-                }
-
-                ACTIVE_DATA = valid;
-                TABLE_PAGE = 0;
-                renderView();
-                document.getElementById('filter-status').classList.remove('hidden');
-                document.getElementById('filter-count').innerText = valid.length;
-                log(`Filtered to ${valid.length} tracks.`);
-            } catch (e) { log(e.message, "text-red-400"); }
-        }
-
-        function renderView() {
-            if (VIEW_MODE === 'map') {
-                document.getElementById('map-view').classList.remove('hidden');
-                document.getElementById('table-view').classList.add('hidden');
-                DECK.setProps({ layers: [getBaseMap(), getPathLayer()] });
-            } else {
-                document.getElementById('map-view').classList.add('hidden');
-                document.getElementById('table-view').classList.remove('hidden');
-                renderGrid();
-            }
-        }
-
-        function renderGrid() {
-            const head = document.getElementById('table-head');
-            head.innerHTML = `<th class="p-3 rounded-l-md">Track ID</th><th class="p-3">Truth</th><th class="p-3">Prediction</th><th class="p-3 text-center">Pts</th><th class="p-3 text-center">V_Air</th>`;
-            CUSTOM_COLS.forEach(c => head.innerHTML += `<th class="p-3 text-green-400 text-center">${c}</th>`);
-            DEBUG_COLS.forEach(c => head.innerHTML += `<th class="p-3 text-pink-400 text-center">${c}</th>`);
-
-            const body = document.getElementById('table-body');
-            const start = TABLE_PAGE * TABLE_LIMIT;
-            const slice = ACTIVE_DATA.slice(start, start + TABLE_LIMIT);
-            body.innerHTML = slice.map(d => {
-                let predHtml = "-";
-                if (SUBMISSION[d.id]) {
-                    const top = Object.entries(SUBMISSION[d.id].scores).sort((a, b) => b[1] - a[1])[0];
-                    predHtml = `<span class="text-purple-400 font-bold">${top[0]}</span> <span class="text-slate-500 text-[10px]">(${(top[1] * 100).toFixed(0)}%)</span>`;
-                }
-                const dispGroup = (d.group === 'Test Set' && d.predictedGroup) ? `<span class="text-purple-400 italic">${d.predictedGroup}</span>` : d.group;
-
-                let rowHtml = `<tr class="table-row bg-slate-800/40 border-b border-slate-800" onclick='selectTrackByID("${d.id}")'>
-                <td class="p-3 font-mono text-blue-400">${d.id}</td>
-                <td class="p-3 font-semibold">${dispGroup}</td>
-                <td class="p-3">${predHtml}</td>
-                <td class="p-3 text-center">${d.coords.length}</td>
-                <td class="p-3 text-center">${d.meta.airspeed.toFixed(1)}</td>`;
-                CUSTOM_COLS.forEach(c => { rowHtml += `<td class="p-3 text-center feat-col">${(typeof d.calculated[c] === 'number' ? d.calculated[c].toFixed(3) : (d.calculated[c] ?? '-'))}</td>`; });
-                DEBUG_COLS.forEach(c => { const v = d.meta[c]; rowHtml += `<td class="p-3 text-center debug-col">${(typeof v === 'number' ? v.toFixed(3) : (v ?? '-'))}</td>`; });
-                rowHtml += `</tr>`;
-                return rowHtml;
-            }).join('');
-            document.getElementById('table-stats').innerText = `Showing index ${start + 1} - ${Math.min(start + TABLE_LIMIT, ACTIVE_DATA.length)} of ${ACTIVE_DATA.length}`;
-        }
-
-        function selectTrackByID(id) { const t = ACTIVE_DATA.find(x => x.id === id); if (t) selectTrack(t); }
-        function changeTablePage(dir) { const next = TABLE_PAGE + dir; if (next >= 0 && next * TABLE_LIMIT < ACTIVE_DATA.length) { TABLE_PAGE = next; renderGrid(); } }
-        function log(msg, cls) {
-            const el = document.getElementById('console-output');
-            el.innerHTML += `<div class="${cls} border-b border-slate-800 pb-1 mb-1">> ${msg}</div>`;
-            el.scrollTop = el.scrollHeight; // Auto-scroll
-        }
-        function setMode(m) {
-            EDITOR_MODE = m;
-            document.getElementById('tab-feature').className = `flex-1 py-2 transition ${m == 'feature' ? 'mode-active bg-slate-800' : 'hover:bg-slate-800'}`;
-            document.getElementById('tab-filter').className = `flex-1 py-2 transition ${m == 'filter' ? 'mode-active bg-slate-800' : 'hover:bg-slate-800'}`;
-            document.getElementById('feature-actions').className = m == 'feature' ? 'flex gap-2' : 'hidden';
-            document.getElementById('filter-actions').className = m == 'filter' ? 'block' : 'hidden';
-            const stored = m === 'feature' ? localStorage.getItem('bd_code_feature') : localStorage.getItem('bd_code_filter');
-            editor.setValue(stored || TEMPLATES[m], -1);
-        }
-
-        function restoreDefault() {
-            if (confirm("Restore default code for this mode?")) {
-                editor.setValue(TEMPLATES[EDITOR_MODE], -1);
-            }
-        }
-
-        function setView(v) { VIEW_MODE = v; document.getElementById('btn-view-map').className = `btn ${v == 'map' ? 'bg-slate-700 text-white' : 'text-slate-400'}`; document.getElementById('btn-view-table').className = `btn ${v == 'table' ? 'bg-slate-700 text-white' : 'text-slate-400'}`; renderView(); }
-        function setMapStyle(s) { MAP_STYLE = s; document.getElementById('btn-style-dark').className = `btn ${s == 'dark' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400'}`; document.getElementById('btn-style-sat').className = `btn ${s == 'satellite' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400'}`; if (VIEW_MODE == 'map') DECK.setProps({ layers: [getBaseMap(), getPathLayer()] }); }
-        function switchDataset() { applySimpleFilters(); }
-        function clearFilter() { document.getElementById('filter-status').classList.add('hidden'); document.getElementById('limit-to-sub').checked = false; applySimpleFilters(); }
-        function closeDetail() { document.getElementById('detail-panel').classList.remove('visible'); SELECTED_ID = null; if (VIEW_MODE == 'map') DECK.setProps({ layers: [getBaseMap(), getPathLayer()] }); }
-
-        init();
-    </script>
+    <script src="birdradar.js" type="text/javascript"></script>
 </body>
 
 </html>
