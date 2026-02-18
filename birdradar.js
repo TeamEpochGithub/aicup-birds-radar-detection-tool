@@ -339,7 +339,7 @@ async function executePython(code, globals, funcName, params) {
             if (forced_token)
                 forced_token = e || forced_token;
             else {
-                try{ localStorage.removeItem('PYTHON_TOKEN'); } catch {}
+                try { localStorage.removeItem('PYTHON_TOKEN'); } catch { }
             }
         }
     }
@@ -1147,7 +1147,7 @@ function setView(v) {
         ["btn-view-map", v == 'map'],
         ["btn-view-map-mobile", v == 'map'],
         ["btn-view-table", v == 'table'],
-        ["btn-view-table-mobile", v =='table']
+        ["btn-view-table-mobile", v == 'table']
     ])
         document.getElementById(id).className = `btn ${set ? 'bg-slate-700 text-white' : 'text-slate-400'}`;
 
@@ -1162,7 +1162,7 @@ function setMapStyle(s) {
         ["btn-style-sat-mobile", s == 'satellite']
     ])
         document.getElementById(id).className = `btn ${set ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400"'}`;
-   
+
     if (VIEW_MODE == 'map' && DECK) DECK.setProps({ layers: [getBaseMap(), getPathLayer()] });
 }
 function clearFilter() {

@@ -470,6 +470,10 @@ code {
     .desktop-only {
         display: none !important;
     }
+
+    #detail-panel {
+        width: 250px !important;
+    }
 }
 
 .embed-mode #sidebar {
