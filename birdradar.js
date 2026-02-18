@@ -1216,6 +1216,27 @@ document.addEventListener('mouseup', () => {
 
 window.addEventListener('DOMContentLoaded', () => {
     if (window.innerWidth < 768) toggleSidebar();
-})
+});
+
+window.addEventListener('click', e => {
+    if (e.target && !document.getElementById('map-container').contains(e.target))
+        document.getElementById('tooltip').style.display = 'none';    
+});
+
+window.addEventListener('mouseup', e => {
+    if (e.target && !document.getElementById('map-container').contains(e.target))
+        document.getElementById('tooltip').style.display = 'none';    
+});
+
+window.addEventListener('touchend', e => {
+    const touch = e.changedTouches[0];
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+
+    if (!element)
+        return;
+
+    if (!document.getElementById('map-container').contains(element))
+        document.getElementById('tooltip').style.display = 'none';
+});
 
 init();

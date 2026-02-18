@@ -473,6 +473,8 @@ code {
 
     #detail-panel {
         width: 250px !important;
+        max-height: 60vh;
+        overflow: scroll;
     }
 }
 
