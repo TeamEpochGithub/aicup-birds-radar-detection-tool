@@ -2,7 +2,7 @@
 
 **BirdRadar** is a powerful web application designed for auditing, visualizing, and feature engineering radar track data for the AI Cup 2026.
 
-Website [https://birds.teamepoch.ai/](https://birds.teamepoch.ai/)
+Website [https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/](https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/)
 
 ## Key Features
 

@@ -14,12 +14,29 @@
         @apply px-3 py-1 rounded font-semibold cursor-pointer transition-all duration-200 text-xs whitespace-nowrap;
     }
 
-    .btn-blue { @apply bg-blue-600 text-white hover:bg-blue-500; }
-    .btn-green { @apply bg-emerald-600 text-white hover:bg-emerald-500; }
-    .btn-orange { @apply bg-orange-600 text-white hover:bg-orange-500; }
-    .btn-purple { @apply bg-purple-600 text-white hover:bg-purple-500; }
-    .btn-gray { @apply bg-slate-700 text-white hover:bg-slate-600; }
-    .btn-red { @apply bg-red-600 text-white hover:bg-red-500; }
+    .btn-blue {
+        @apply bg-blue-600 text-white hover:bg-blue-500;
+    }
+
+    .btn-green {
+        @apply bg-emerald-600 text-white hover:bg-emerald-500;
+    }
+
+    .btn-orange {
+        @apply bg-orange-600 text-white hover:bg-orange-500;
+    }
+
+    .btn-purple {
+        @apply bg-purple-600 text-white hover:bg-purple-500;
+    }
+
+    .btn-gray {
+        @apply bg-slate-700 text-white hover:bg-slate-600;
+    }
+
+    .btn-red {
+        @apply bg-red-600 text-white hover:bg-red-500;
+    }
 
     .btn-file {
         @apply relative overflow-hidden bg-slate-700 text-slate-300;
@@ -33,32 +50,50 @@
         @apply text-white border-b-2 border-blue-500;
     }
 }
+
 /* Define Custom Utilities
    Using @utility makes these recognized by Tailwind's engine, 
    allowing them to be used in HTML/JS and referenced in this file.
 */
 @utility mode-active {
-  color: #ffffff;
-  border-bottom-width: 2px;
-  --tw-border-opacity: 1;
-  border-color: rgb(59 130 246 / var(--tw-border-opacity));
+    color: #ffffff;
+    border-bottom-width: 2px;
+    --tw-border-opacity: 1;
+    border-color: rgb(59 130 246 / var(--tw-border-opacity));
 }
 
 @utility panel {
-  @apply bg-slate-800/40 border border-slate-700 rounded-lg;
+    @apply bg-slate-800/40 border border-slate-700 rounded-lg;
 }
 
 @utility btn {
-  @apply px-3 py-1 rounded font-semibold cursor-pointer transition-all duration-200 text-xs whitespace-nowrap;
+    @apply px-3 py-1 rounded font-semibold cursor-pointer transition-all duration-200 text-xs whitespace-nowrap;
 }
 
 /* Color Variants as Utilities */
-@utility btn-blue { @apply bg-blue-600 text-white hover:bg-blue-500; }
-@utility btn-green { @apply bg-emerald-600 text-white hover:bg-emerald-500; }
-@utility btn-orange { @apply bg-orange-600 text-white hover:bg-orange-500; }
-@utility btn-purple { @apply bg-purple-600 text-white hover:bg-purple-600/90; }
-@utility btn-gray { @apply bg-slate-700 text-white hover:bg-slate-600; }
-@utility btn-red { @apply bg-red-600 text-white hover:bg-red-500; }
+@utility btn-blue {
+    @apply bg-blue-600 text-white hover:bg-blue-500;
+}
+
+@utility btn-green {
+    @apply bg-emerald-600 text-white hover:bg-emerald-500;
+}
+
+@utility btn-orange {
+    @apply bg-orange-600 text-white hover:bg-orange-500;
+}
+
+@utility btn-purple {
+    @apply bg-purple-600 text-white hover:bg-purple-600/90;
+}
+
+@utility btn-gray {
+    @apply bg-slate-700 text-white hover:bg-slate-600;
+}
+
+@utility btn-red {
+    @apply bg-red-600 text-white hover:bg-red-500;
+}
 
 /* SAFELIST: Force inclusion of dynamic classes used in JS.
    In v4, simply listing the classes in a comment inside a scanned file 
@@ -77,27 +112,37 @@
   text-slate-300 text-red-400 text-green-400 text-blue-400 text-purple-400
   bg-purple-500 w-12 h-1 overflow-hidden mode-active
   bg-slate-700 text-white text-slate-400 bg-slate-900 bg-slate-950 visible embed-mode hidden collapsed
-  opacity-70 ml-1
+  opacity-70 ml-1 -translate-x-full md:block md:hidden
 */
 
 /* Base structural overrides */
 body {
-  @apply bg-slate-950 text-slate-300 font-sans overflow-hidden;
+    @apply bg-slate-950 text-slate-300 font-sans overflow-hidden;
 }
 
 #map-container {
-  @apply relative w-full h-full bg-black;
+    @apply relative w-full h-full bg-black;
 }
 
 #detail-panel {
-  @apply absolute bottom-5 right-5 w-[400px] max-h-[85vh] bg-slate-900/95 backdrop-blur-md border border-slate-700 rounded-xl flex flex-col overflow-hidden shadow-2xl transition-all duration-300 z-50 translate-y-[120%];
+    @apply absolute bottom-5 right-5 w-[400px] max-h-[85vh] bg-slate-900/95 backdrop-blur-md border border-slate-700 rounded-xl flex flex-col overflow-hidden shadow-2xl transition-all duration-300 z-50 translate-y-[120%];
 }
 
-#detail-panel.visible { @apply translate-y-0; }
-#detail-panel.maximized { @apply w-[90vw] h-[90vh] bottom-[5vh] right-[5vw] max-h-none; }
+#detail-panel.visible {
+    @apply translate-y-0;
+}
 
-.feat-col { @apply text-emerald-400 font-mono; }
-.debug-col { @apply text-pink-400 font-mono; }
+#detail-panel.maximized {
+    @apply w-[90vw] h-[90vh] bottom-[5vh] right-[5vw] max-h-none;
+}
+
+.feat-col {
+    @apply text-emerald-400 font-mono;
+}
+
+.debug-col {
+    @apply text-pink-400 font-mono;
+}
 
 /* Base structural overrides */
 body {
@@ -132,8 +177,13 @@ body {
     @apply fixed inset-0 bg-slate-950 z-[9999] flex flex-col items-center justify-center transition-opacity duration-500;
 }
 
-.feat-col { @apply text-emerald-400 font-mono; }
-.debug-col { @apply text-pink-400 font-mono; }
+.feat-col {
+    @apply text-emerald-400 font-mono;
+}
+
+.debug-col {
+    @apply text-pink-400 font-mono;
+}
 
 body {
     background: #0f172a;
@@ -417,21 +467,6 @@ code {
 }
 
 @media (max-width: 768px) {
-    #sidebar {
-        width: 0;
-        min-width: 0;
-        overflow: hidden;
-        border: none;
-    }
-
-    #sidebar.open {
-        width: 100%;
-        min-width: 100%;
-        position: absolute;
-        z-index: 40;
-        height: calc(100% - 3.5rem);
-    }
-
     .desktop-only {
         display: none !important;
     }
@@ -452,4 +487,65 @@ code {
 .embed-mode #map-view {
     width: 100vw;
     height: 100vh;
+}
+
+/* 1. Mobile Margins Fix */
+body {
+    margin: 0;
+    padding: 0;
+    height: 100dvh;
+    background-color: #020617;
+}
+
+/* 2. Responsive Visibility (Replaces 'md:hidden' and 'md:block') */
+/* Default (Mobile): Show Hamburger, Hide Map Style Buttons */
+.desktop-only-btn {
+    display: none !important;
+}
+
+.mobile-only-btn {
+    display: block !important;
+}
+
+/* Desktop (Width > 768px) */
+@media (min-width: 768px) {
+    .desktop-only-btn {
+        display: block !important;
+    }
+
+    .mobile-only-btn {
+        display: none !important;
+    }
+
+    /* Sidebar becomes relative on desktop */
+    #sidebar {
+        position: relative !important;
+        transform: none !important;
+        width: 33.333333%;
+        /* Default w-1/3 */
+        min-width: 350px;
+        max-width: 800px;
+        /* Allow resizing up to this */
+    }
+
+    #sidebar-backdrop {
+        display: none !important;
+    }
+}
+
+/* 3. Resizable Sidebar Handle */
+.resizer {
+    width: 5px;
+    background: #1e293b;
+    cursor: col-resize;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 50;
+    transition: background 0.2s;
+}
+
+.resizer:hover {
+    background: #3b82f6;
 }

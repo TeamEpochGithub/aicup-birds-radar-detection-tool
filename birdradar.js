@@ -314,7 +314,7 @@ async function executePython(code, globals, funcName, params) {
             let url = `/api/python?token=${PYTHON_TOKEN}`;
             try {
                 url = (new URL(PYTHON_TOKEN)).toString();
-            } catch {}
+            } catch { }
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -342,7 +342,7 @@ async function executePython(code, globals, funcName, params) {
     }
 
     if (forced_token)
-        throw new Error("Failed to access the local python API, remove #token= to fallback to pyodide" + ((forced_token && typeof forced_token != 'boolean') ? ', error: ' + String(forced_token) : ''), { cause: (forced_token && typeof forced_token != 'boolean') ? forced_token : null});
+        throw new Error("Failed to access the local python API, remove #token= to fallback to pyodide" + ((forced_token && typeof forced_token != 'boolean') ? ', error: ' + String(forced_token) : ''), { cause: (forced_token && typeof forced_token != 'boolean') ? forced_token : null });
 
     // 2. Pyodide Fallback
     if (!PYODIDE) await loadPyodideEngine();
@@ -627,7 +627,26 @@ function closeTutorialForever() {
 }
 
 function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('collapsed');
+    const sb = document.getElementById('sidebar');
+
+    // Toggle the class that moves the sidebar off-screen
+    // The class '-translate-x-full' hides it. Removing it shows it.
+    sb.classList.toggle('-translate-x-full');
+
+    // Show/Hide the backdrop based on sidebar state
+    if (sb.classList.contains('-translate-x-full')) {
+        // Sidebar is hidden
+        sb.style.visibility = 'hidden';
+        sb.style.opacity = '0';
+        sb.style.left = '-100%';
+        sb.style.setProperty('position', 'absolute', 'important');
+    } else {
+        // Sidebar is visible
+        sb.style.visibility = 'visible';
+        sb.style.opacity = '100';
+        sb.style.left = '0';
+        sb.style.setProperty('position', 'relative', 'important');
+    }
 }
 
 function handleFileUpload(input, type) {
@@ -805,15 +824,28 @@ function fitMapToData(rows) {
     const lonBuf = (maxLon - minLon) * 0.1;
     DECK.setProps({
         initialViewState: {
-            longitude: (minLon + maxLon) / 2, latitude: (minLat + maxLat) / 2,
-            zoom: 11, pitch: 45, bearing: 0
+            longitude: (minLon + maxLon) / 2 - 0.005, latitude: (minLat + maxLat) / 2 - 0.005,
+            zoom: 14.5, pitch: 45, bearing: 0
         },
         controller: { minZoom: 9 }
     });
 }
 
 function initMap() {
-    DECK = new DeckGL({ container: 'map-container', initialViewState: { latitude: 53.44, longitude: 6.84, zoom: 11, pitch: 50, bearing: 0 }, controller: true, layers: [getBaseMap(), getPathLayer()] });
+    DECK = new DeckGL({
+        container: 'map-container',
+        initialViewState: { latitude: 53.44, longitude: 6.84, zoom: 13, pitch: 50, bearing: 0 },
+        controller: true,
+        layers: [getBaseMap(), getPathLayer()],
+
+        // ADD THIS BLOCK:
+        onClick: (info) => {
+            // If user clicks the map background (not a track), hide the tooltip
+            if (!info.object) {
+                document.getElementById('tooltip').style.display = 'none';
+            }
+        }
+    });
 }
 
 function getBaseMap() {
@@ -876,8 +908,9 @@ function selectTrack(track, openPanel = true) {
         x: track.coords.map(c => (c[0] - c0[0]) * 111139 * Math.cos(c0[1] * Math.PI / 180)),
         y: track.coords.map(c => (c[1] - c0[1]) * 111139),
         z: track.coords.map(c => c[2]),
+        customdata: track.times,
         line: { width: 4, color: '#3b82f6' }, marker: { size: 2, color: track.coords.map(c => c[3]), colorscale: 'Viridis' },
-        hovertemplate: 'X: %{x:.1f}m<br>Y: %{y:.1f}m<br>Z: %{z:.1f}m<br>RCS: %{marker.color:.1f} dB<extra></extra>'
+        hovertemplate: 'X: %{x:.1f}m<br>Y: %{y:.1f}m<br>Z: %{z:.1f}m<br>RCS: %{marker.color:.1f} dB<br>Time: %{customdata:.2f}s<extra></extra>'
     }], {
         margin: { t: 0, b: 0, l: 0, r: 0 }, paper_bgcolor: 'rgba(0,0,0,0)',
         scene: { xaxis: { title: 'X', color: '#94a3b8' }, yaxis: { title: 'Y', color: '#94a3b8' }, zaxis: { title: 'Z', color: '#94a3b8' }, aspectmode: 'data', camera: { eye: { x: 1.5, y: 1.5, z: 0.5 } } }
@@ -1105,10 +1138,30 @@ function toggleMaximize() {
     }, 300);
 }
 
-function setView(v) { 
-    VIEW_MODE = v; 
-    document.getElementById('btn-view-map').className = `btn ${v == 'map' ? 'bg-slate-700 text-white' : 'text-slate-400'}`; document.getElementById('btn-view-table').className = `btn ${v == 'table' ? 'bg-slate-700 text-white' : 'text-slate-400'}`; renderView(); }
-function setMapStyle(s) { MAP_STYLE = s; document.getElementById('btn-style-dark').className = `btn ${s == 'dark' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400'}`; document.getElementById('btn-style-sat').className = `btn ${s == 'satellite' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400'}`; if (VIEW_MODE == 'map' && DECK) DECK.setProps({ layers: [getBaseMap(), getPathLayer()] }); }
+function setView(v) {
+    VIEW_MODE = v;
+    for (const [id, set] of [
+        ["btn-view-map", v == 'map'],
+        ["btn-view-map-mobile", v == 'map'],
+        ["btn-view-table", v == 'table'],
+        ["btn-view-table-mobile", v =='table']
+    ])
+        document.getElementById(id).className = `btn ${set ? 'bg-slate-700 text-white' : 'text-slate-400'}`;
+
+    renderView();
+}
+function setMapStyle(s) {
+    MAP_STYLE = s;
+    for (const [id, set] of [
+        ["btn-style-dark", s == 'dark'],
+        ["btn-style-dark-mobile", s == 'dark'],
+        ["btn-style-sat", s == 'satellite'],
+        ["btn-style-sat-mobile", s == 'satellite']
+    ])
+        document.getElementById(id).className = `btn ${set ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400"'}`;
+   
+    if (VIEW_MODE == 'map' && DECK) DECK.setProps({ layers: [getBaseMap(), getPathLayer()] });
+}
 function clearFilter() {
     document.getElementById('limit-to-sub').checked = false;
     document.getElementById('search-id').value = "";
@@ -1121,9 +1174,45 @@ function closeDetail() {
     const element = document.getElementById('detail-panel');
     element.style.display = 'none';
     element.classList.remove('visible');
-    SELECTED_ID = null; 
-    if (VIEW_MODE == 'map') 
+    SELECTED_ID = null;
+    if (VIEW_MODE == 'map')
         DECK.setProps({ layers: [getBaseMap(), getPathLayer()] });
 }
+
+// Simple drag logic for the sidebar resizer
+const resizer = document.getElementById('sidebar-resizer');
+const sidebar = document.getElementById('sidebar');
+let isResizing = false;
+
+resizer.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    document.body.style.cursor = 'col-resize';
+    resizer.classList.add('bg-blue-500');
+});
+
+document.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+    // Limit width between 350px and 800px
+    const newWidth = Math.min(800, Math.max(350, e.clientX));
+    sidebar.style.width = newWidth + 'px';
+    sidebar.style.flexBasis = newWidth + 'px'; // Ensure flexbox respects it
+
+    // Trigger resize for editor and map
+    if (window.editor) window.editor.resize();
+});
+
+document.addEventListener('mouseup', () => {
+    if (isResizing) {
+        isResizing = false;
+        document.body.style.cursor = 'default';
+        resizer.classList.remove('bg-blue-500');
+        // Trigger map resize event so DeckGL updates
+        window.dispatchEvent(new Event('resize'));
+    }
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+    if (window.innerWidth < 768) toggleSidebar();
+})
 
 init();
