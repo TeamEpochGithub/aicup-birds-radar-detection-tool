@@ -338,6 +338,9 @@ async function executePython(code, globals, funcName, params) {
             console.warn(e);
             if (forced_token)
                 forced_token = e || forced_token;
+            else {
+                try{ localStorage.removeItem('PYTHON_TOKEN'); } catch {}
+            }
         }
     }
 
