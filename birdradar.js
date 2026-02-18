@@ -1,4 +1,6 @@
-const { DeckGL, PathLayer, TileLayer, BitmapLayer } = deck;
+const { DeckGL, PathLayer, TileLayer, MVTLayer, TerrainLayer, Tile3DLayer, BitmapLayer } = deck;
+// The 3D tiles loader comes from the loaders global if using CDN
+
 
 // --- CONSTANTS ---
 const BIRD_GROUPS = ["Unknown", "Clutter", "Cormorants", "Pigeons", "Ducks", "Geese", "Gulls", "Birds of Prey", "Waders", "Songbirds"];
@@ -500,7 +502,7 @@ function renderView() {
     if (VIEW_MODE === 'map') {
         document.getElementById('map-view').classList.remove('hidden');
         document.getElementById('table-view').classList.add('hidden');
-        DECK.setProps({ layers: [getBaseMap(), getPathLayer()] });
+        DECK.setProps({ layers: [...getBaseLayers(), getPathLayer()] });
     } else {
         document.getElementById('map-view').classList.add('hidden');
         document.getElementById('table-view').classList.remove('hidden');
@@ -839,7 +841,7 @@ function initMap() {
         container: 'map-container',
         initialViewState: { latitude: 53.44, longitude: 6.84, zoom: 13, pitch: 50, bearing: 0 },
         controller: true,
-        layers: [getBaseMap(), getPathLayer()],
+        layers: [...getBaseLayers(), getPathLayer()],
 
         // ADD THIS BLOCK:
         onClick: (info) => {
@@ -851,9 +853,80 @@ function initMap() {
     });
 }
 
-function getBaseMap() {
-    const url = MAP_STYLE === 'dark' ? 'https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png' : 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-    return new TileLayer({ id: 'base-tiles', data: url, minZoom: 0, maxZoom: 19, tileSize: 256, renderSubLayers: props => new BitmapLayer(props, { data: null, image: props.data, bounds: [props.tile.bbox.west, props.tile.bbox.south, props.tile.bbox.east, props.tile.bbox.north] }) });
+function getOpenFreeMapBuildings() {
+    return new MVTLayer({
+        id: 'open-free-map-buildings',
+        // Free, keyless vector tiles from OpenFreeMap
+        data: 'https://tiles.openfreemap.org/planet/{z}/{x}/{y}.mvt',
+
+        minZoom: 13,
+        maxZoom: 14, // Cap zoom to avoid over-fetching
+
+        // IMPORTANT: Explain to deck.gl how to read this specific data structure
+        // The building data is usually in a layer named 'building'
+        renderSubLayers: props => {
+            if (!props.data) return null;
+
+            // Filter: only draw features that are actually buildings
+            const buildingsData = props.data.filter(f =>
+                f.properties.layer === 'building' ||
+                f.properties.class === 'building'
+            );
+
+            return new PolygonLayer(props, {
+                id: `${props.id}-polygons`,
+                data: buildingsData,
+
+                // 1. Get the polygon shape
+                getPolygon: d => d.geometry.coordinates,
+
+                // 2. Extrude it to make it 3D
+                extruded: true,
+                wireframe: true,
+
+                // 3. Calculate Height (approximate if data is missing)
+                getElevation: d => {
+                    // OSM data often has 'render_height', 'height', or 'levels'
+                    return d.properties.render_height || d.properties.height || (d.properties.render_min_height + 10) || 15;
+                },
+
+                // Visuals
+                getFillColor: [200, 200, 200, 200], // Light Grey
+                getLineColor: [100, 100, 100],
+                lineWidthMinPixels: 1
+            });
+        }
+    });
+}
+
+/**
+ * HIGH-RES DUTCH AERIAL MAP (PDOK)
+ * We use the WMTS service which is much faster and compatible with TileLayer
+ */
+function getBaseLayers() {
+    // PDOK high-res aerial (25cm resolution)
+    const pdokAerial = 'https://service.pdok.nl/hwh/luchtfotorgb/wmts/v1_0/Actueel_ortho25/EPSG:3857/{z}/{x}/{y}.jpeg';
+    const darkMap = 'https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png';
+
+    const url = MAP_STYLE === 'dark' ? darkMap : pdokAerial;
+
+    const tileLayer = new TileLayer({
+        id: 'base-tiles',
+        data: url,
+        minZoom: 0,
+        maxZoom: 19,
+        tileSize: 256,
+        renderSubLayers: props => {
+            const { west, south, east, north } = props.tile.bbox;
+            return new BitmapLayer(props, {
+                data: null,
+                image: props.data,
+                bounds: [west, south, east, north]
+            });
+        }
+    });
+
+    return [tileLayer];
 }
 
 function getPathLayer() {
@@ -883,7 +956,7 @@ function getPathLayer() {
 function selectTrack(track, openPanel = true) {
     if (!track) { closeDetail(); return; }
     SELECTED_ID = track.id;
-    if (VIEW_MODE === 'map' && DECK) DECK.setProps({ layers: [getBaseMap(), getPathLayer()] });
+    if (VIEW_MODE === 'map' && DECK) DECK.setProps({ layers: [...getBaseLayers(), getPathLayer()] });
     if (openPanel) {
         const detailPanel = document.getElementById('detail-panel');
         detailPanel.style.display = 'block';
@@ -1163,7 +1236,7 @@ function setMapStyle(s) {
     ])
         document.getElementById(id).className = `btn ${set ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400"'}`;
 
-    if (VIEW_MODE == 'map' && DECK) DECK.setProps({ layers: [getBaseMap(), getPathLayer()] });
+    if (VIEW_MODE == 'map' && DECK) DECK.setProps({ layers: [...getBaseLayers(), getPathLayer()] });
 }
 function clearFilter() {
     document.getElementById('limit-to-sub').checked = false;
@@ -1179,7 +1252,7 @@ function closeDetail() {
     element.classList.remove('visible');
     SELECTED_ID = null;
     if (VIEW_MODE == 'map')
-        DECK.setProps({ layers: [getBaseMap(), getPathLayer()] });
+        DECK.setProps({ layers: [...getBaseLayers(), getPathLayer()] });
 }
 
 // Simple drag logic for the sidebar resizer
@@ -1220,12 +1293,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
 window.addEventListener('click', e => {
     if (e.target && !document.getElementById('map-container').contains(e.target))
-        document.getElementById('tooltip').style.display = 'none';    
+        document.getElementById('tooltip').style.display = 'none';
 });
 
 window.addEventListener('mouseup', e => {
     if (e.target && !document.getElementById('map-container').contains(e.target))
-        document.getElementById('tooltip').style.display = 'none';    
+        document.getElementById('tooltip').style.display = 'none';
 });
 
 window.addEventListener('touchend', e => {
