@@ -22,7 +22,7 @@ const BIRD_SPECIES = [
     'Egyptian Goose', 'Large Gull', 'Common Tern', 'Sheep'
 ];
 
-const RADAR_SIZES = ["Unknown", "Small bird", "Medium", "Large", "Flock"];
+const RADAR_SIZES = ["Large bird", "Small bird", "Medium", "Large", "Flock"];
 
 const XOR_KEY = "ACCEPT_THE_COMPETITION_TERMS_AT_https://www.kaggle.com/competitions/ai-cup-2026-performance/rules_TO_USE_THE_TEST_SET_DO_NOT_REVERSE_ENGINEER";
 
@@ -284,6 +284,93 @@ function parseBinaryData(buffer, isTest) {
     return { rows, days };
 }
 
+function updateEngineStatus(engine) {
+    const el = document.getElementById('console-status');
+    if (el) el.innerText = `Engine: ${engine}`;
+}
+
+let didToldTheUserAboutPackagesForLocalServer = false
+
+/**
+ * High-level Python Execution abstraction.
+ * Tries local server engine if token present, otherwise uses Pyodide.
+ */
+async function executePython(code, globals, funcName, params) {
+    // Engine Detection
+    let PYTHON_TOKEN = null;
+    if (window.location.hash.startsWith('#token='))
+        PYTHON_TOKEN = window.location.hash.substring(7);
+    else if (localStorage.getItem('PYTHON_TOKEN'))
+        PYTHON_TOKEN = localStorage.getItem('PYTHON_TOKEN')
+
+    if (PYTHON_TOKEN)
+        localStorage.setItem('PYTHON_TOKEN', PYTHON_TOKEN)
+
+    // 1. Try Local Server
+    if (PYTHON_TOKEN) {
+        try {
+            const response = await fetch(`/api/python?token=${PYTHON_TOKEN}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code, globals, funcName, params })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if (!didToldTheUserAboutPackagesForLocalServer)
+                    log("NOTE: Using your local python environment, please install packages locally using `uv add` they will not auto-install", "text-slate-300")
+                didToldTheUserAboutPackagesForLocalServer = true
+
+                updateEngineStatus("Local Server");
+                if (data.stdout)
+                    log(data.stdout, "text-slate-300")
+                if (data.stderr)
+                    log(data.stderr, "text-red-400")
+                return data.result;
+            }
+        } catch (e) {
+            console.warn("Local server connection failed, falling back to Pyodide.");
+        }
+    }
+
+    // 2. Pyodide Fallback
+    if (!PYODIDE) await loadPyodideEngine();
+    updateEngineStatus("Pyodide (WASM) in browser");
+
+    await checkAndInstallImports(code);
+    await PYODIDE.runPythonAsync(code);
+
+    // Inject Globals
+    for (const [k, v] of Object.entries(globals)) {
+        PYODIDE.globals.set(k, (!v || typeof v != 'object') ? PYODIDE.toPy(v) : v);
+    }
+
+    // Call function
+    if (funcName)
+        return await PYODIDE.globals.get(funcName)(...params.map(v => (!v || typeof v != 'object') ? PYODIDE.toPy(v) : v));
+
+    return null;
+}
+
+async function loadPyodideEngine() {
+    updateEngineStatus("Loading Pyodide...");
+    log("Initializing Pyodide WASM...", "text-blue-400");
+    PYODIDE = await loadPyodide({
+        stdout: (t) => log(t, "text-slate-300"),
+        stderr: (t) => log(t, "text-red-400")
+    });
+    await PYODIDE.loadPackage(["numpy", "scipy", "pandas", "micropip"]);
+    MICROPIP = PYODIDE.pyimport("micropip");
+}
+
+async function checkAndInstallImports(code) {
+    if (!MICROPIP) return;
+    const packages = [...code.matchAll(/^\s*(?:import|from)\s+([a-zA-Z0-9_\-]+)/gm)].map(m => m[1]);
+    for (let pkg of packages) {
+        if (['math', 'json', 'numpy', 'pandas', 'scipy', 'os', 'sys'].includes(pkg)) continue;
+        try { await PYODIDE.runPythonAsync(`import ${pkg}`); } catch (e) { try { await MICROPIP.install(pkg); } catch (err) { } }
+    }
+}
+
 async function init() {
     try {
         if (IS_EMBED) {
@@ -311,9 +398,6 @@ async function init() {
         await loadBinary('train');
 
         if (!IS_EMBED) {
-            PYODIDE = await loadPyodide({ stdout: (t) => log(t, "text-slate-300"), stderr: (t) => log(t, "text-red-400") });
-            await PYODIDE.loadPackage(["numpy", "scipy", "pandas", "micropip"]);
-            MICROPIP = PYODIDE.pyimport("micropip");
             document.getElementById('loader').style.opacity = '0';
             setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
         } else {
@@ -356,7 +440,7 @@ async function loadBinary(type) {
 // --- TERMS & LAZY LOAD ---
 
 async function runFeatureCalcForSelected() {
-    if (!SELECTED_ID || !PYODIDE) return;
+    if (!SELECTED_ID) return;
     const track = ACTIVE_DATA.find(d => d.id === SELECTED_ID);
     try {
         // Re-use batch logic for single item
@@ -375,7 +459,6 @@ async function runFeatureCalcForSelected() {
 }
 
 async function runPythonFilter() {
-    if (!PYODIDE) return;
     log("Running global filter (Batched)...");
     try {
         // Run on the currently selected RAW Dataset
@@ -410,7 +493,6 @@ function renderView() {
 }
 
 async function runFeatureCalcOnPage() {
-    if (!PYODIDE) return;
     const start = TABLE_PAGE * TABLE_LIMIT;
     const tracks = ACTIVE_DATA.slice(start, start + TABLE_LIMIT);
 
@@ -609,14 +691,15 @@ async function calculateScore() {
         const y_t = validIdx.map(i => y_true[i]);
         const y_s = validIdx.map(i => groups.map(g => SUBMISSION[train[i].id].scores[g]));
 
-        PYODIDE.globals.set("y_true", PYODIDE.toPy(y_t));
-        PYODIDE.globals.set("y_score", PYODIDE.toPy(y_s));
-        const mAP = await PYODIDE.runPythonAsync(`
+        const mAP = await executePython(`
 from sklearn.metrics import average_precision_score
 import numpy as np
 y_t, y_s = np.array(y_true), np.array(y_score)
 aps = [average_precision_score((y_t == i).astype(int), y_s[:, i]) for i in range(len(y_s[0])) if np.sum(y_t == i) > 0]
-float(np.mean(aps)) if aps else 0.0`);
+float(np.mean(aps)) if aps else 0.0`, {
+            "y_ture": y_t,
+            "y_score": y_s,
+        });
         document.getElementById('score-status').classList.remove('hidden');
         document.getElementById('mAP-val').innerText = mAP.toFixed(4);
     } catch (e) { console.error(e); }
@@ -753,7 +836,11 @@ function selectTrack(track, openPanel = true) {
     if (!track) { closeDetail(); return; }
     SELECTED_ID = track.id;
     if (VIEW_MODE === 'map' && DECK) DECK.setProps({ layers: [getBaseMap(), getPathLayer()] });
-    if (openPanel) document.getElementById('detail-panel').classList.add('visible');
+    if (openPanel) {
+        const detailPanel = document.getElementById('detail-panel');
+        detailPanel.style.display = 'block';
+        detailPanel.classList.add('visible');
+    }
     document.getElementById('detail-id').innerText = track.id;
 
     const predArea = document.getElementById('detail-sub');
@@ -791,45 +878,41 @@ function selectTrack(track, openPanel = true) {
 // ... [Include runBatchInPyodide, runStats, etc., which remain largely similar but adapted to new data struct] ...
 
 async function runBatchInPyodide(batch, mode) {
-    if (!PYODIDE) return [];
     const funcName = mode === 'filter' ? 'filter' : 'calculate';
     let code = (mode === 'filter') ? (localStorage.getItem('bd_code_filter') || TEMPLATES.filter) : (EDITOR_MODE === 'feature' ? editor.getValue() : (localStorage.getItem('bd_code_feature') || TEMPLATES.feature));
-    await checkAndInstallImports(code); await PYODIDE.runPythonAsync(code);
-    await PYODIDE.runPythonAsync(`
-import numpy as np, json, traceback, gc
+
+    return jsonRes = JSON.parse(await executePython(`
+import numpy as np, json, traceback, gc, traceback
 def _batch_runner(tracks, mode):
+    global filter, calculate
+
     results = []
-    func = globals().get(mode)
-    if not func: return []
+
+    if mode == 'filter': func = filter
+    else: func = calculate
+
+    if not func: return '[]'
     for t in tracks:
         try:
-            c = np.array([list(coord) for coord in list(t.coords)])
-            tm = np.array(list(t.times))
-            m = t.meta.to_py()
+            c = np.array([list(coord) for coord in list(t.coords if hasattr(t, 'coords') else t['coords'])])
+            tm = np.array(list(t.times if hasattr(t, 'times') else t['times']))
+            if hasattr(t, 'meta'):
+                m = t.meta.to_py()
+            else:
+                m = t['meta']
             res = func(c, tm, m)
             if mode == 'filter': res = bool(res)
             results.append(res)
             del c, tm, m
-        except Exception as e: results.append(None)
+        except Exception as e: 
+            traceback.print_exc()
+            results.append(None)
     gc.collect()
     return json.dumps(results)
-            `);
-    PYODIDE.globals.set("batch_proxy", batch);
-    const jsonRes = await PYODIDE.runPythonAsync(`_batch_runner(batch_proxy, '${funcName}')`);
-    return JSON.parse(jsonRes);
-}
-
-async function checkAndInstallImports(code) {
-    if (!MICROPIP) return;
-    const packages = [...code.matchAll(/^\s*(?:import|from)\s+([a-zA-Z0-9_\-]+)/gm)].map(m => m[1]);
-    for (let pkg of packages) {
-        if (['math', 'json', 'numpy', 'pandas', 'scipy', 'os', 'sys'].includes(pkg)) continue;
-        try { await PYODIDE.runPythonAsync(`import ${pkg}`); } catch (e) { try { await MICROPIP.install(pkg); } catch (err) { } }
-    }
+\n\n${code}`, {}, '_batch_runner', [batch, funcName]))
 }
 
 async function runStats(mode) {
-    if (!PYODIDE) return;
     if (mode === 'overlap' && !TEST_SET_LOADED) { checkTermsAndLoadTest(() => runStats(mode)); return; }
     const container = document.getElementById('stats-charts');
     container.innerHTML = `<div class="col-span-2 text-center text-slate-400">Processing massive data... please wait...</div>`;
@@ -942,10 +1025,44 @@ function changeTablePage(dir) {
         runFeatureCalcOnPage();
     }
 }
-function log(msg, cls) {
-    const el = document.getElementById('console-output');
-    el.innerHTML += `<div class="${cls} border-b border-slate-800 pb-1 mb-1">> ${msg}</div>`;
-    el.scrollTop = el.scrollHeight; // Auto-scroll
+
+let log_count = 0
+let last_log = 0
+let did_msg_exhausted = false
+
+function log(txt, cls) {
+    txt = String(txt).trim()
+
+    let now = performance.now();
+    let time_since_last_log = now - last_log;
+    let rem = time_since_last_log / 100
+    if (rem >= log_count)
+        log_count = 0
+    else
+        log_count -= rem
+    last_log = now
+
+    for (let msg of String(txt).split('\n')) {
+        msg = msg.trim()
+        if (!msg) return
+
+        if (log_count > 100) {
+            if (did_msg_exhausted) return
+            msg = "... [Truncated print statements for performance] ..."
+            did_msg_exhausted = true
+        } else
+            did_msg_exhausted = false
+
+        let max_len = 256 + ((100 - log_count) * 100)
+        if (msg > max_len)
+            msg = msg.slice(0, max_len) + "..."
+
+        const el = document.getElementById('console-output');
+        el.innerHTML += `<div class="${cls} border-b border-slate-800 pb-1 mb-1">> ${msg}</div>`;
+        el.scrollTop = el.scrollHeight; // Auto-scroll
+
+        log_count++;
+    }
 }
 function setMode(m) {
     EDITOR_MODE = m;
@@ -964,8 +1081,11 @@ function restoreDefault() {
 }
 
 function toggleMaximize() {
-    const p = document.getElementById('detail-panel');
-    p.classList.toggle('maximized');
+    const detailPanel = document.getElementById('detail-panel');
+    detailPanel.style.display = 'block';
+    detailPanel.classList.add('visible');
+    detailPanel.classList.toggle('maximized');
+
     setTimeout(() => {
         const plt = document.getElementById('detail-plot');
         if (plt) Plotly.Plots.resize(plt);
@@ -982,6 +1102,13 @@ function clearFilter() {
     PYTHON_FILTERED_IDS = null;
     applySimpleFilters();
 }
-function closeDetail() { document.getElementById('detail-panel').classList.remove('visible'); SELECTED_ID = null; if (VIEW_MODE == 'map') DECK.setProps({ layers: [getBaseMap(), getPathLayer()] }); }
+function closeDetail() {
+    const element = document.getElementById('detail-panel');
+    element.style.display = 'none';
+    element.classList.remove('visible');
+    SELECTED_ID = null; 
+    if (VIEW_MODE == 'map') 
+        DECK.setProps({ layers: [getBaseMap(), getPathLayer()] });
+}
 
 init();

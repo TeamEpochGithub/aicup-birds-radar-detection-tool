@@ -1,6 +1,8 @@
 # Please participate in https://www.kaggle.com/competitions/ai-cup-2026-performance to get the test.csv
 test.csv
 
+.env
+tailwindcss-linux-x64
 __pycache__/
 *.py[oc]
 build/

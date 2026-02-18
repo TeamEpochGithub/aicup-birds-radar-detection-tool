@@ -1,8 +1,6 @@
 # 🦅 BirdRadar - AI Cup 2026 Bird Track Radar
 
-**BirdRadar** is a powerful, serverless, single-file HTML application designed for auditing, visualizing, and feature engineering radar track data for the AI Cup 2026.
-
-It runs entirely in your browser using **WebAssembly (Pyodide)**, allowing you to write Python code to filter tracks and calculate features on the fly without installing a local Python environment.
+**BirdRadar** is a powerful web application designed for auditing, visualizing, and feature engineering radar track data for the AI Cup 2026.
 
 Website [https://birds.teamepoch.ai/](https://birds.teamepoch.ai/)
 
@@ -27,15 +25,36 @@ cd aicup-birds-radar-detection-tool
 2. **Add Data:**
 Place your `train.csv` and `test.csv` in the root folder from [https://www.kaggle.com/competitions/ai-cup-2026-performance/data](https://www.kaggle.com/competitions/ai-cup-2026-performance/data)
 
-3. **Run:**
-Because the app fetches CSV files and uses WebAssembly, it works best when served via a local server (to avoid CORS issues).
+3. **Local Run:**
+You can locally run the website using the following command. In contrast to the public site, this will use your local python environment giving you better performance and library access.
 
 ```bash
 uv run app.py
 ```
 
-Then open `http://localhost:8000` in your browser.
-*> **Note:** You can also drag-and-drop CSV files directly into the UI if you don't want to run a local server.*
+You get an output as follow:
+```text
+======================================================================
+BIRD RADAR DEVELOPMENT SERVER
+URL: http://localhost:8000/#token=TOKEN
+Engine: Local Python execution enabled via /api/python
+======================================================================
+```
+
+Open the printed URL with token in your browser. Confirm that local python environment is used _Engine: Local Server_ in the status bar
+
+*NOTE*: The URL with token allows executing python with full privileges of your machine
+
+4. **Static site:***
+
+The app can also be hosted as static site (e.g using nginx, github pages). The python code will then not be executed on the machine but instead be run on Pyodide in the user's browser, this allows the tool to be safely shared with the public without risking a RCE. Performance is decent in pyodide but some advanced functionalities maybe missing.
+
+Required files to statically serve:
+- index.html (ensure / is served as index.html)
+- birdradar.js
+- birdradar.css
+- train.bin
+- test.bin
 
 ## Python API Guide
 
@@ -118,6 +137,18 @@ track_id, ...[classes]... ,cluster_id,embedding_x,outlier_score
 * **Plotly.js:** 3D Scatter plots and statistical charts.
 * **TailwindCSS:** Styling.
 * **Ace Editor:** Code editing.
+
+### Compiling tailwind css
+
+```bash
+curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
+
+# Make it executable
+chmod +x tailwindcss-linux-x64
+
+# Compile your CSS
+./tailwindcss-linux-x64 -i ./birdradar-tailwind.css -o ./birdradar.compiled.css --content "./index.html,./birdradar.js" --minify
+```
 
 ## Contributing
 

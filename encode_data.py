@@ -34,7 +34,7 @@ BIRD_GROUPS = [
     "Birds of Prey", "Waders", "Songbirds"
 ]
 
-RADAR_SIZES = ["Unknown", "Small bird", "Medium", "Large", "Flock"]
+RADAR_SIZES = ["Large bird", "Small bird", "Medium", "Large", "Flock"]
 
 XOR_KEY = "ACCEPT_THE_COMPETITION_TERMS_AT_https://www.kaggle.com/competitions/ai-cup-2026-performance/rules_TO_USE_THE_TEST_SET_DO_NOT_REVERSE_ENGINEER"
 
