@@ -298,9 +298,11 @@ let didToldTheUserAboutPackagesForLocalServer = false
 async function executePython(code, globals, funcName, params) {
     // Engine Detection
     let PYTHON_TOKEN = null;
-    if (window.location.hash.startsWith('#token='))
+    let forced_token = false;
+    if (window.location.hash.startsWith('#token=')) {
         PYTHON_TOKEN = window.location.hash.substring(7);
-    else if (localStorage.getItem('PYTHON_TOKEN'))
+        forced_token = true;
+    } else if (localStorage.getItem('PYTHON_TOKEN'))
         PYTHON_TOKEN = localStorage.getItem('PYTHON_TOKEN')
 
     if (PYTHON_TOKEN)
@@ -309,7 +311,11 @@ async function executePython(code, globals, funcName, params) {
     // 1. Try Local Server
     if (PYTHON_TOKEN) {
         try {
-            const response = await fetch(`/api/python?token=${PYTHON_TOKEN}`, {
+            let url = `/api/python?token=${PYTHON_TOKEN}`;
+            try {
+                url = (new URL(PYTHON_TOKEN)).toString();
+            } catch {}
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code, globals, funcName, params })
@@ -329,8 +335,14 @@ async function executePython(code, globals, funcName, params) {
             }
         } catch (e) {
             console.warn("Local server connection failed, falling back to Pyodide.");
+            console.warn(e);
+            if (forced_token)
+                forced_token = e || forced_token;
         }
     }
+
+    if (forced_token)
+        throw new Error("Failed to access the local python API, remove #token= to fallback to pyodide" + ((forced_token && typeof forced_token != 'boolean') ? ', error: ' + String(forced_token) : ''), { cause: (forced_token && typeof forced_token != 'boolean') ? forced_token : null});
 
     // 2. Pyodide Fallback
     if (!PYODIDE) await loadPyodideEngine();
@@ -1093,7 +1105,9 @@ function toggleMaximize() {
     }, 300);
 }
 
-function setView(v) { VIEW_MODE = v; document.getElementById('btn-view-map').className = `btn ${v == 'map' ? 'bg-slate-700 text-white' : 'text-slate-400'}`; document.getElementById('btn-view-table').className = `btn ${v == 'table' ? 'bg-slate-700 text-white' : 'text-slate-400'}`; renderView(); }
+function setView(v) { 
+    VIEW_MODE = v; 
+    document.getElementById('btn-view-map').className = `btn ${v == 'map' ? 'bg-slate-700 text-white' : 'text-slate-400'}`; document.getElementById('btn-view-table').className = `btn ${v == 'table' ? 'bg-slate-700 text-white' : 'text-slate-400'}`; renderView(); }
 function setMapStyle(s) { MAP_STYLE = s; document.getElementById('btn-style-dark').className = `btn ${s == 'dark' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400'}`; document.getElementById('btn-style-sat').className = `btn ${s == 'satellite' ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400'}`; if (VIEW_MODE == 'map' && DECK) DECK.setProps({ layers: [getBaseMap(), getPathLayer()] }); }
 function clearFilter() {
     document.getElementById('limit-to-sub').checked = false;

@@ -21,11 +21,7 @@ git clone https://github.com/TeamEpochGithub/aicup-birds-radar-detection-tool.gi
 cd aicup-birds-radar-detection-tool
 ```
 
-
-2. **Add Data:**
-Place your `train.csv` and `test.csv` in the root folder from [https://www.kaggle.com/competitions/ai-cup-2026-performance/data](https://www.kaggle.com/competitions/ai-cup-2026-performance/data)
-
-3. **Local Run:**
+2. **Local Run:**
 You can locally run the website using the following command. In contrast to the public site, this will use your local python environment giving you better performance and library access.
 
 ```bash
@@ -45,9 +41,9 @@ Open the printed URL with token in your browser. Confirm that local python envir
 
 *NOTE*: The URL with token allows executing python with full privileges of your machine
 
-4. **Static site:***
+3. **Static site:***
 
-The app can also be hosted as static site (e.g using nginx, github pages). The python code will then not be executed on the machine but instead be run on Pyodide in the user's browser, this allows the tool to be safely shared with the public without risking a RCE. Performance is decent in pyodide but some advanced functionalities maybe missing.
+The app can also be hosted as static site (e.g using nginx, github pages). The python code will then not be executed on the server/machine but instead be run on Pyodide in the user's browser, this allows the tool to be safely shared with the public without risking a RCE. Performance is decent in pyodide but some advanced functionalities might be missing.
 
 Required files to statically serve:
 - index.html (ensure / is served as index.html)
@@ -55,6 +51,8 @@ Required files to statically serve:
 - birdradar.css
 - train.bin
 - test.bin
+
+This is used at [https://birds.teamepoch.ai](https://birds.teamepoch.ai)
 
 ## Python API Guide
 
