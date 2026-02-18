@@ -36,20 +36,91 @@ const CATEGORY_COLORS = {
 };
 
 const TEMPLATES = {
-    feature: `import numpy as np
+    feature: `import numpy as np # Imports install automatically from pip3
 
 def calculate(coords, times, meta):
-    z = coords[:, 2]
+    """
+    This function calculates features for every track. 
+    The returned dictionary keys become sortable columns in the Grid View.
+
+    Inputs:
+    - coords: (N, 4) numpy array -> [Longitude, Latitude, Altitude (m), Radar Cross Section (dB)]
+    - times:  (N,) numpy array   -> Elapsed time in seconds since the track started
+    - meta:   Dictionary containing all metadata columns from the CSV: track_id,timestamp_start_radar_utc,timestamp_end_radar_utc,radar_bird_size,airspeed,min_z,max_z,observation_id,primary_observation_id,observer_position,observer_comment,n_birds_observed,bird_group,bird_species and is_test
+    """
+    
+    # --- 1. Accessing Raw Radar Data (coords & times) ---
+    lon = coords[:, 0]
+    lat = coords[:, 1]
+    altitudes = coords[:, 2]
+    rcs_values = coords[:, 3]
+    duration = float(times[-1] - times[0]) if len(times) > 0 else 0
+
+    # --- 2. Radar-derived Columns (Available in Train & Test) ---
+    radar_size = meta.get("radar_bird_size")
+    airspeed = meta.get("airspeed", 0)
+    # min_z and max_z are pre-calculated by the MAX Avian Radar
+    radar_min_z = meta.get("min_z", 0)
+    radar_max_z = meta.get("max_z", 0)
+
+    # --- 3. Observation-related Columns (Available in Train Only) ---
+    # Note: These return "Unknown" or 0 when viewing the Test Set.
+    bird_group = meta.get("bird_group")
+    bird_species = meta.get("bird_species")
+    n_birds = meta.get("n_birds_observed", 0)
+    comment = meta.get("observer_comment", "")
+    obs_id = meta.get("observation_id", 0)
+    p_obs_id = meta.get("primary_observation_id", 0)
+
+    # --- 4. Returning Features ---
+    # Add any custom logic here (e.g., np.std(rcs_values) to find signal stability)
     return {
-        "min_z": float(np.min(z)),
-        "max_z": float(np.max(z)),
-        "pts": len(coords),
-        "airspeed": meta.get("airspeed", 0)
+        "bird_group": bird_group,       # The broad category (Gulls, Ducks, etc.)
+        "bird_species": bird_species,   # The specific species (Mallard, etc.)
+        "n_birds": n_birds,             # Count of birds in the flock
+        "airspeed": airspeed,           # Speed relative to air
+        "duration": duration,           # Total time track was active
+        "avg_rcs": float(np.mean(rcs_values)), # Average radar signature
+        "height_fluctuation": float(np.max(altitudes) - np.min(altitudes)),
+        "radar_size_cat": radar_size,   # Radar's internal size estimate
+        "timestamp_start_radar_utc": meta.get("timestamp_start_radar_utc"),
+        "timestamp_end_radar_utc": meta.get("timestamp_end_radar_utc"),
+        "min_z": meta.get("min_z"),
+        "max_z": meta.get("max_z")
     }`,
     filter: `import numpy as np
-
+    
 def filter(coords, times, meta):
-    return np.mean(coords[:, 3]) < -30`
+    """
+    This function filters the dataset.
+    Return True to KEEP the track on the map/grid.
+    Return False to HIDE the track.
+
+    Inputs:
+    - coords: (N, 4) numpy array -> [Longitude, Latitude, Altitude (m), Radar Cross Section (dB)]
+    - times:  (N,) numpy array   -> Elapsed time in seconds since the track started
+    - meta:   Dictionary containing all metadata columns from the CSV: track_id,timestamp_start_radar_utc,timestamp_end_radar_utc,radar_bird_size,airspeed,min_z,max_z,observation_id,primary_observation_id,observer_position,observer_comment,n_birds_observed,bird_group,bird_species and is_test
+    """
+
+    lon = coords[:, 0]
+    lat = coords[:, 1]
+    altitudes = coords[:, 2]
+    rcs_values = coords[:, 3]
+
+    # --- Example A: Filter by Species (Train set only) ---
+    # return meta.get("bird_group") == "Birds of Prey"
+
+    # --- Example B: Filter by Altitude ---
+    # Show only tracks that fly above 200 meters at any point
+    # max_alt = np.max(coords[:, 2])
+    # return max_alt > 200
+
+    # --- Example C: Complex Multi-column Filter ---
+    # Show small birds (radar size) flying faster than 15 m/s
+    is_small = meta.get("radar_bird_size") == "Small bird"
+    is_fast = meta.get("airspeed", 0) > 15
+    
+    return is_small and is_fast`
 };
 
 let PYODIDE = null, MICROPIP = null;
