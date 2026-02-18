@@ -6,7 +6,6 @@ Website [https://birds.teamepoch.ai/](https://birds.teamepoch.ai/)
 
 ## Key Features
 
-* **Zero-Install:** Just open `index.html` in your browser.
 * **3D Visualization:** Inspect flight paths, altitudes, and RCS values using Deck.gl and Plotly.
 * **In-Browser Python Engine:** Write Python code to engineer features and filter data. Changes reflect instantly in the grid.
 * **Submission Auditing:** Upload your `submission.csv`. The app calculates your **mAP score** locally and allows you to filter the map by specific predictions.
@@ -41,7 +40,7 @@ Open the printed URL with token in your browser. Confirm that local python envir
 
 *NOTE*: The URL with token allows executing python with full privileges of your machine
 
-3. **Static site:***
+3. **Static site:**
 
 The app can also be hosted as static site (e.g using nginx, github pages). The python code will then not be executed on the server/machine but instead be run on Pyodide in the user's browser, this allows the tool to be safely shared with the public without risking a RCE. Performance is decent in pyodide but some advanced functionalities might be missing.
 

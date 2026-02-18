@@ -36,7 +36,9 @@ ALLOWED_FILES = {
     "test.bin": "test.bin",
     "introduction_notebook_submission.csv": "introduction_notebook_submission.csv",
     "birdradar.js": "birdradar.js",
-    "birdradar.compiled.css": "birdradar.compiled.css"
+    "birdradar.compiled.css": "birdradar.compiled.css",
+    "favicon.png": "favicon.png",
+    "favicon.ico": "favicon.ico"
 }
 
 BASE_DIR = Path(__file__).parent.resolve()

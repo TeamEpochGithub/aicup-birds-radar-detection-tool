@@ -52,3 +52,37 @@ Scientific Research) and are provided subject to the following strict conditions
    the test set data.
 
    You agree that you use the test data for competition purposes only.
+
+4. ATTRIBUTION REQUIREMENT
+   Any use, modification, or distribution of the dataset must include
+   clear attribution to the original author:
+
+   © 2026 AI Cup 2026, AIC4NL | Team Epoch
+   Dataset provided by TNO (Netherlands Organisation for Applied Scientific Research)
+
+   Attribution must be visible in:
+   - Source code distributions (in the LICENSE file), and
+   - End-user applications (e.g., in an "About", documentation, or credits section), if applicable.
+
+--------------------------------------------------------------------------------
+
+TRADEMARK & ASSET RESTRICTIONS
+
+The MIT License does not grant any rights to use the trademarks, service marks, 
+logos, or distinctive brand features of the copyright holders.
+
+1. PROTECTED NAMES
+   The names "AI Cup 2026", "AIC4NL", and "Team Epoch" are reserved names. 
+   You may not use these names to endorse or promote products derived from 
+   this software without specific prior written permission.
+
+2. COPYRIGHTED VISUAL ASSETS
+   The following files are excluded from the MIT License and remain the 
+   exclusive property of Team Epoch:
+   - favicon.png
+   - favicon.ico
+
+   These files are provided solely for the operation of the software as 
+   distributed by Team Epoch. They may not be used, copied, or distributed 
+   independently of this software, nor may they be used to represent any 
+   other product, service, or derivative work.
