@@ -355,6 +355,7 @@ async function loadPyodideEngine() {
     updateEngineStatus("Loading Pyodide...");
     log("Initializing Pyodide WASM...", "text-blue-400");
     PYODIDE = await loadPyodide({
+        indexURL: "https://cdn.jsdelivr.net/pyodide/v0.28.3/full/",
         stdout: (t) => log(t, "text-slate-300"),
         stderr: (t) => log(t, "text-red-400")
     });
