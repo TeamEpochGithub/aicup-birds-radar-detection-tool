@@ -124,13 +124,13 @@ track_id, ...[classes]... ,cluster_id,embedding_x,outlier_score
 
 ```
 
+* These columns become accessible in the Python engine via `meta['cluster_id']`.
+
 ### Train rows
 
 The submission csv for the website can contain extra rows of the train set, this lets you calculate your local mAP score.
 Rember that such a enhanced submission csv is invalid for kaggle. Ensure your pipeline creates a stripped submission csv with only probalities for the test data for Kaggle scoring.
 
-
-* These columns become accessible in the Python engine via `meta['cluster_id']`.
 
 ## 🛠️ Built With
 
