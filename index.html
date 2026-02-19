@@ -13,8 +13,7 @@
 
     <link rel="preload" href="/train.bin" as="fetch" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.7.3/maplibre-gl.css"
-        integrity="sha512-IylZQnfgxyZ4rs0/u4TjuOthOSWKwh47nrCPuscGnyidnt1mrhKdja/uUxfvkLaMusDAWV3DgKHHpfzNdTdGhw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+        integrity="sha384-gNYNsUmuZqDYiT3gbirWTV5K7rt71RoveS/yXAaU09d4ZUmeDVTD3XoqB6uJAIFR" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/3.1.1/plotly.min.js"
         integrity="sha512-QaIUFweb9pyRnQZEYIujSDTHndibSwqsTSb69aedsfAAUpJRUE5yyYfaNAJIbTDuNECyHR/Cc0N7lQJrp0IEpA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -28,8 +27,8 @@
         integrity="sha384-tEG529toczQRv/bqd2PyHy5vTO49FMjQri0c1oB44gSkYiNouZz8L9yNTVx0YGl+"
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.7.3/maplibre-gl.js"
-        integrity="sha512-4qLefPK7TDle+A82wrHOa/B75+B8HH0w6Zwu6YaoXxwfBrLl8tQ7UmoyS0PCWOobcq3fFe51G+AN+jVZpwN5qOw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        integrity="sha384-58glfsJ+cxARGnts6etFXqTluJx24YUgVY1WQxNLIfLkwT7yJfBORU1dKLD/YFTG"
+        crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pyodide/0.28.3/pyodide.js"
         integrity="sha512-TFamTPeAQKwgGbabpRIIWxZBpzwIuj1xVChXqq8lbQ7n4u3HovOP31LZ0jikqVT/tKaYarLddqMn2KXVOJ6MKw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -308,8 +307,10 @@
                 Stats</button>
             <div class="h-6 w-px bg-slate-700 embed-hidden"></div>
             <div class="flex bg-slate-800 p-1 rounded border border-slate-600 embed-hidden">
-                <button onclick="setView('map')" id="btn-view-map" class="btn bg-slate-700 text-white hidden xl:flex">Map</button>
-                <button onclick="setView('table')" id="btn-view-table" class="btn text-slate-400 hidden xl:flex">Grid</button>
+                <button onclick="setView('map')" id="btn-view-map"
+                    class="btn bg-slate-700 text-white hidden xl:flex">Map</button>
+                <button onclick="setView('table')" id="btn-view-table"
+                    class="btn text-slate-400 hidden xl:flex">Grid</button>
             </div>
             <button onclick="setMapStyle('dark')" id="btn-style-dark"
                 class="btn bg-slate-700 text-white hidden xl:flex">Light</button>
@@ -418,10 +419,16 @@
 
         <div class="absolute top-2 left-2 z-20 bg-slate-800/90 backdrop-blur rounded p-2 border border-slate-600 hidden"
             id="embed-filter-overlay">
+            <input id="embed-search-id" type="text" placeholder="Search ID..."
+                onchange="document.getElementById('search-id').value = this.value; applySimpleFilters();"
+                class="flex-1 bg-slate-900 border border-slate-600 rounded px-3 py-1 text-sm text-white outline-none focus:border-blue-500 min-w-[80px]">
             <select id="embed-search-class"
                 class="bg-slate-900 border border-slate-600 rounded px-3 py-1 text-sm text-white outline-none"
                 onchange="document.getElementById('search-class').value = this.value; applySimpleFilters();">
             </select>
+            <select id="embed-search-day"
+                class="bg-slate-900 border border-slate-600 rounded px-3 py-1 text-sm text-white outline-none"
+                onchange="document.getElementById('search-day').value = this.value; applySimpleFilters();"></select>
         </div>
 
         <main class="flex-1 relative bg-slate-950" style="overflow: scroll">

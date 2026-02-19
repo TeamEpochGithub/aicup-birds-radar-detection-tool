@@ -47,9 +47,12 @@ The app can also be hosted as static site (e.g using nginx, github pages). The p
 Required files to statically serve:
 - index.html (ensure / is served as index.html)
 - birdradar.js
-- birdradar.css
+- birdradar.compiled.css (compiled from tailwind's birdradar-tailwind.css)
 - train.bin
-- test.bin
+- favicon.ico
+- favicon.png
+- test.bin (optional)
+- debug_introduction_notebook_submission.csv (optional)
 
 This is used at [https://birds.teamepoch.ai](https://birds.teamepoch.ai)
 
@@ -106,7 +109,7 @@ def filter(coords, times, meta):
 
 ### Standard Submission
 
-Upload a standard submission file to see your local mAP score and visualize predicted classes vs ground truth.
+Upload a standard submission file to visualize your predicted classes.
 
 ```csv
 track_id,Clutter,Cormorants,Pigeons,Ducks,Geese,Gulls,Birds of Prey,Waders,Songbirds
@@ -128,9 +131,11 @@ track_id, ...[classes]... ,cluster_id,embedding_x,outlier_score
 
 ### Train rows
 
-The submission csv for the website can contain extra rows of the train set, this lets you calculate your local mAP score.
+The submission csv for the website can contain extra rows of the train set. The website will then also plot the predicted score against train rows, with the ground truth, and calculate a mean average score. Its useful to put your local cross validation test rows in here.
+
 Rember that such a enhanced submission csv is invalid for kaggle. Ensure your pipeline creates a stripped submission csv with only probalities for the test data for Kaggle scoring.
 
+See [introduction_workshop.py](introduction_workshop.py)
 
 ## 🛠️ Built With
 
@@ -161,4 +166,4 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 Source code is licensed under [MIT](https://choosealicense.com/licenses/mit/)
 
-The datasets are excluded from MIT and have their own conditions. Please see the LICENSE file
+The datasets are excluded from MIT and have their own conditions. Please see the [LICENSE](LICENSE) file

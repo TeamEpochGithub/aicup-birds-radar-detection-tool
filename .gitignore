@@ -1,6 +1,8 @@
 # Please participate in https://www.kaggle.com/competitions/ai-cup-2026-performance to get the test.csv
 test.csv
 
+# We use the debug submission as sample for the site, ignore the actual kaggle submission
+introduction_notebook_submission.csv
 .env
 tailwindcss-linux-x64
 __pycache__/

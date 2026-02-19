@@ -34,7 +34,7 @@ ALLOWED_FILES = {
     "index.html": "index.html",
     "train.bin": "train.bin",
     "test.bin": "test.bin",
-    "introduction_notebook_submission.csv": "introduction_notebook_submission.csv",
+    "debug_introduction_notebook_submission.csv": "debug_introduction_notebook_submission.csv",
     "birdradar.js": "birdradar.js",
     "birdradar.compiled.css": "birdradar.compiled.css",
     "favicon.png": "favicon.png",
@@ -69,29 +69,16 @@ def run_python():
     func_name = data.get("funcName")
     params = data.get("params", [])
     globals_data = data.get("globals", {})
+
+    stdout = io.StringIO()
+    stderr = io.StringIO()
     
     try:
         import numpy as np
         # Setup environment
         exec_globals = {"np": np, "json": json}
         exec_globals.update(globals_data)
-        
-        stdout = io.StringIO()
-        stderr = io.StringIO()
 
-        with tee_stdout_stderr(stdout, stderr):
-            # Execute user code to define functions
-            exec(code, exec_globals)
-            
-            if not func_name:
-                return jsonify({"result": "Code executed successfully (no function called)", "stdout": str(stdout.getvalue()), "stderr": str(stderr.getvalue())})
-
-            func = exec_globals.get(func_name)
-            if not func or not callable(func):
-                return jsonify({"error": f"Function '{func_name}' not found or not callable", "stdout": str(stdout.getvalue()), "stderr": str(stderr.getvalue())}), 400
-                
-            result = func(*params)
-        
         # Helper to make result JSON-serializable (handles numpy)
         def serialize(obj):
             if obj is None: return obj
@@ -106,6 +93,19 @@ def run_python():
                 return str(obj)
             except Exception:
                 return None
+
+        with tee_stdout_stderr(stdout, stderr):
+            # Execute user code to define functions
+            result = exec(code, exec_globals)
+            
+            if not func_name:
+                return jsonify({"result": serialize(result), "stdout": str(stdout.getvalue()), "stderr": str(stderr.getvalue())})
+
+            func = exec_globals.get(func_name)
+            if not func or not callable(func):
+                return jsonify({"error": f"Function '{func_name}' not found or not callable", "stdout": str(stdout.getvalue()), "stderr": str(stderr.getvalue())}), 400
+                
+            result = func(*params)
             
         return jsonify({"result": serialize(result), "stdout": str(stdout.getvalue()), "stderr": str(stderr.getvalue())})
         
@@ -113,7 +113,9 @@ def run_python():
         import traceback
         return jsonify({
             "error": str(e),
-            "traceback": traceback.format_exc()
+            "traceback": traceback.format_exc(),
+            "stdout": str(stdout.getvalue()),
+            "stderr": str(stderr.getvalue())
         }), 500
 
 if __name__ == "__main__":

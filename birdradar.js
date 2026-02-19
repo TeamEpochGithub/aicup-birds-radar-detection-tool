@@ -291,7 +291,7 @@ function updateEngineStatus(engine) {
     if (el) el.innerText = `Engine: ${engine}`;
 }
 
-let didToldTheUserAboutPackagesForLocalServer = false;
+let didToldTheUserAboutPackages = false;
 
 /**
  * High-level Python Execution abstraction.
@@ -310,6 +310,8 @@ async function executePython(code, globals, funcName, params) {
     if (PYTHON_TOKEN)
         localStorage.setItem('PYTHON_TOKEN', PYTHON_TOKEN)
 
+    let pythonErrored = false;
+
     // 1. Try Local Server
     if (PYTHON_TOKEN) {
         try {
@@ -322,22 +324,34 @@ async function executePython(code, globals, funcName, params) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code, globals, funcName, params })
             });
-            if (response.ok) {
-                const data = await response.json();
-                if (!didToldTheUserAboutPackagesForLocalServer)
-                    log("NOTE: Using your local python environment, please install packages locally using `uv add` they will not auto-install", "text-slate-300");
-                didToldTheUserAboutPackagesForLocalServer = true;
 
-                updateEngineStatus("Local Server");
-                if (data.stdout)
-                    log(data.stdout, "text-slate-300");
-                if (data.stderr)
-                    log(data.stderr, "text-red-400");
-                return data.result;
+            const data = await response.json();
+            if (!didToldTheUserAboutPackages)
+                log("NOTE: Using your local python environment, please install packages locally using `uv add` they will not auto-install", "text-slate-300");
+            didToldTheUserAboutPackages = true;
+
+            updateEngineStatus("Local Server");
+            if (data.stdout)
+                log(data.stdout, "text-slate-300");
+            if (data.stderr)
+                log(data.stderr, "text-red-400");
+
+            if (!response.ok || data.error) {
+                if (!data.error) 
+                    throw new Error("Server returned an error with status: " + response.statusText)
+                let err = new Error(data.error + (data.traceback ? "\n" + data.traceback : ""));
+                pythonErrored = true
+                throw err;
             }
+
+            return data.result;
+            
         } catch (e) {
+            if (pythonErrored) 
+                throw e;
             console.warn("Local server connection failed, falling back to Pyodide.");
             console.warn(e);
+            log(String(e), "text-red-400");
             if (forced_token)
                 forced_token = e || forced_token;
             else {
@@ -361,6 +375,11 @@ async function executePython(code, globals, funcName, params) {
         PYODIDE.globals.set(k, (!v || typeof v != 'object') ? PYODIDE.toPy(v) : v);
     }
 
+    if (!didToldTheUserAboutPackages)
+        log("NOTE: Using your browser as python engine. Packages usually auto-install some packages can be installed by import micropip + await micropip.install(\"package-name\")", "text-slate-300");
+    didToldTheUserAboutPackages = true;
+
+
     // Call function
     if (funcName)
         return await PYODIDE.globals.get(funcName)(...params.map(v => (!v || typeof v != 'object') ? PYODIDE.toPy(v) : v));
@@ -376,7 +395,7 @@ async function loadPyodideEngine() {
         stdout: (t) => log(t, "text-slate-300"),
         stderr: (t) => log(t, "text-red-400")
     });
-    await PYODIDE.loadPackage(["numpy", "scipy", "pandas", "micropip"]);
+    await PYODIDE.loadPackage(["numpy", "scipy", "pandas", "micropip", "scikit-learn"]);
     MICROPIP = PYODIDE.pyimport("micropip");
 }
 
@@ -675,7 +694,7 @@ function loadSampleSubmission() {
     checkTermsAndLoadTest(async () => {
         try {
             if (!RAW_DATA.test || RAW_DATA.test.length === 0) return;
-            let csv = await fetch("introduction_notebook_submission.csv").then(t => t.text());
+            let csv = await fetch("debug_introduction_notebook_submission.csv").then(t => t.text());
             parseSubmission(csv);
             log("Loaded generated sample submission.", "text-blue-400");
         } catch (ex) {
@@ -717,7 +736,7 @@ async function calculateScore() {
     if (train.length === 0) return;
     const groups = BIRD_GROUPS.filter(g => g !== "Unknown");
     try {
-        const y_true = train.map(d => groups.indexOf(d.group) !== -1 ? groups.indexOf(d.group) : -1);
+        const y_true = train.map(d => groups.indexOf(d.meta.bird_group) !== -1 ? groups.indexOf(d.meta.bird_group) : -1);
         // Filter out Unknowns from GT
         const validIdx = y_true.map((v, i) => v !== -1 ? i : -1).filter(i => i !== -1);
         if (validIdx.length === 0) return;
@@ -725,18 +744,19 @@ async function calculateScore() {
         const y_t = validIdx.map(i => y_true[i]);
         const y_s = validIdx.map(i => groups.map(g => SUBMISSION[train[i].id].scores[g]));
 
-        const mAP = await executePython(`
-from sklearn.metrics import average_precision_score
-import numpy as np
-y_t, y_s = np.array(y_true), np.array(y_score)
-aps = [average_precision_score((y_t == i).astype(int), y_s[:, i]) for i in range(len(y_s[0])) if np.sum(y_t == i) > 0]
-float(np.mean(aps)) if aps else 0.0`, {
-            "y_ture": y_t,
-            "y_score": y_s,
-        });
+        const mAP = parseFloat(await executePython(`
+def _calculate_score(y_true, y_score):
+    from sklearn.metrics import average_precision_score
+    import numpy as np
+    y_t, y_s = np.array(y_true), np.array(y_score)
+    aps = [average_precision_score((y_t == i).astype(int), y_s[:, i]) for i in range(len(y_s[0])) if np.sum(y_t == i) > 0]
+    return float(np.mean(aps)) if aps else 0.0`, {}, '_calculate_score', [y_t, y_s]));
         document.getElementById('score-status').classList.remove('hidden');
         document.getElementById('mAP-val').innerText = mAP.toFixed(4);
-    } catch (e) { console.error(e); }
+    } catch (e) { 
+        console.error(e); 
+        log(String(e), "text-red-400");
+    }
 }
 
 function applySimpleFilters() {

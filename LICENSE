@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 Team Epoch
+Copyright (c) 2026 AI Cup 2026 - Team Epoch
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,18 +40,20 @@ Scientific Research) and are provided subject to the following strict conditions
    The data may only be used for academic and non-commercial purposes. 
    Commercial use is strictly prohibited.
 
-2. COMPETITION RULES (TEST SET)
-   Access to and use of the test set (`test.csv`, `test.bin`, `introduction_notebook_submission.csv`) is strictly 
+2. COMPETITION RULES FOR TEST SET
+   Access to and use of the test set (`test.csv`, `test.bin`, `debug_introduction_notebook_submission.csv`) is strictly 
    conditional upon agreeing to the terms and rules of the AI Cup 2026 – 
    Performance Track competition. By accessing these files, you acknowledge 
    that you have read and agreed to the rules located at:
    https://www.kaggle.com/competitions/ai-cup-2026-performance/rules, especially section 2.4 Competition Data
 
-3. NO REVERSE ENGINEERING
-   You may not attempt to reverse engineer, de-anonymize, or manually label 
-   the test set data.
+   This condition holds until the data is explicitly revealed by the compeition organizers.
 
-   You agree that you use the test data for competition purposes only.
+3. NO REVERSE ENGINEERING OF TEST SET
+   You may not attempt to reverse engineer, de-anonymize, or manually label 
+   the test set data. (`test.csv`, `test.bin`, `debug_introduction_notebook_submission.csv`)
+
+   You agree that you use the test data only to calculate, submit and debug submissions for the AI Cup 2026 competition only until the test data, if it happens, is revealed by the competition organizers.
 
 4. ATTRIBUTION REQUIREMENT
    Any use, modification, or distribution of the dataset must include
@@ -63,6 +65,15 @@ Scientific Research) and are provided subject to the following strict conditions
    Attribution must be visible in:
    - Source code distributions (in the LICENSE file), and
    - End-user applications (e.g., in an "About", documentation, or credits section), if applicable.
+
+5. DISCLAIMER
+   THE DATASET IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE DATASET OR THE USE OR OTHER DEALINGS IN THE
+   DATASET.
 
 --------------------------------------------------------------------------------
 
