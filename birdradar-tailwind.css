@@ -318,7 +318,7 @@ body {
     border-radius: 12px;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: scroll;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease, bottom 0.3s ease, right 0.3s ease;
     transform: translateY(120%);
@@ -342,6 +342,25 @@ body {
     height: 100% !important;
     flex: 1;
     min-height: 0;
+}
+
+
+@media (min-width: 768px) {
+    #detail-panel.maximized #detail-plot {
+        min-height: 300px;
+    }
+}
+
+@media (min-width: 1024px) {
+    #detail-panel.maximized #detail-plot {
+        min-height: 500px;
+    }
+}
+
+@media (min-width: 1536px) {
+    #detail-panel.maximized #detail-plot {
+        min-height: 750px;
+    }
 }
 
 #detail-panel.maximized #detail-content-wrapper {

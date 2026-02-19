@@ -28,7 +28,7 @@
         integrity="sha384-tEG529toczQRv/bqd2PyHy5vTO49FMjQri0c1oB44gSkYiNouZz8L9yNTVx0YGl+"
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/5.7.3/maplibre-gl.js"
-        integrity="sha512-4qLefPK7TDle+A82wrHOa/B75+B8HH0w6Zwu6YaoXxwBrLl8tQ7UmoyS0PCWOobcq3fFe51G+AN+jVZpwN5qOw=="
+        integrity="sha512-4qLefPK7TDle+A82wrHOa/B75+B8HH0w6Zwu6YaoXxwfBrLl8tQ7UmoyS0PCWOobcq3fFe51G+AN+jVZpwN5qOw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pyodide/0.28.3/pyodide.js"
         integrity="sha512-TFamTPeAQKwgGbabpRIIWxZBpzwIuj1xVChXqq8lbQ7n4u3HovOP31LZ0jikqVT/tKaYarLddqMn2KXVOJ6MKw=="
@@ -77,7 +77,7 @@
     </div>
 
     <div id="help-modal" class="modal embed-hidden">
-        <div class="modal-content max-w-5xl mx-auto h-auto max-h-[90vh]">
+        <div class="modal-content max-w-5xl mx-auto h-auto max-h-[90vh]" style="height: auto;">
             <div
                 class="h-16 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-6 shrink-0 z-10">
                 <h2 class="text-xl font-bold text-white flex items-center gap-2">📖 User Manual & Tutorial</h2>
@@ -300,7 +300,7 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-3 hidden md:flex">
+        <div class="flex items-center gap-3 hidden lg:flex">
             <button onclick="document.getElementById('help-modal').style.display='block'"
                 class="btn btn-gray w-8 h-8 flex items-center justify-center rounded-full text-lg font-bold embed-hidden">?</button>
             <button onclick="document.getElementById('stats-modal').style.display='block'"
@@ -308,13 +308,13 @@
                 Stats</button>
             <div class="h-6 w-px bg-slate-700 embed-hidden"></div>
             <div class="flex bg-slate-800 p-1 rounded border border-slate-600 embed-hidden">
-                <button onclick="setView('map')" id="btn-view-map" class="btn bg-slate-700 text-white">Map</button>
-                <button onclick="setView('table')" id="btn-view-table" class="btn text-slate-400">Grid</button>
+                <button onclick="setView('map')" id="btn-view-map" class="btn bg-slate-700 text-white hidden xl:flex">Map</button>
+                <button onclick="setView('table')" id="btn-view-table" class="btn text-slate-400 hidden xl:flex">Grid</button>
             </div>
             <button onclick="setMapStyle('dark')" id="btn-style-dark"
-                class="btn bg-slate-700 text-white desktop-only-btn">Light</button>
+                class="btn bg-slate-700 text-white hidden xl:flex">Light</button>
             <button onclick="setMapStyle('satellite')" id="btn-style-sat"
-                class="btn bg-slate-800 text-slate-400 desktop-only-btn">Satellite</button>
+                class="btn bg-slate-800 text-slate-400 hidden xl:flex">Satellite</button>
         </div>
     </header>
 
@@ -323,24 +323,24 @@
             class="fixed inset-y-0 left-0 z-30 w-3/4 max-w-[300px] bg-slate-800 border-r border-slate-700 flex flex-col transition-transform duration-300 transform shadow-2xl">
             <div class="resizer desktop-only-btn" id="sidebar-resizer"></div>
 
-            <nav class="space-y-4 md:hidden">
+            <nav class="space-y-4 xl:hidden">
                 <!-- Help -->
                 <button onclick="document.getElementById('help-modal').style.display='block'"
-                    class="w-full flex items-center px-3 py-3 rounded-lg hover:bg-slate-800 transition">
+                    class="w-full flex items-center px-3 py-3 rounded-lg hover:bg-slate-800 transition lg:hidden">
                     <span class="text-slate-400 mr-3">&gt;</span>
                     <span>Help</span>
                 </button>
 
-                <hr class="border-slate-700">
+                <hr class="border-slate-700 lg:hidden">
 
                 <!-- Stats -->
                 <button onclick="document.getElementById('stats-modal').style.display='block'"
-                    class="w-full flex items-center px-3 py-3 rounded-lg hover:bg-slate-800 transition">
+                    class="w-full flex items-center px-3 py-3 rounded-lg hover:bg-slate-800 transition lg:hidden">
                     <span class="text-slate-400 mr-3">&gt;</span>
                     <span>📊 Stats</span>
                 </button>
 
-                <hr class="border-slate-700">
+                <hr class="border-slate-700 lg:hidden">
 
                 <!-- View Toggle -->
                 <div class="space-y-2">

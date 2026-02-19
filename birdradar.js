@@ -442,11 +442,8 @@ async function loadBinary(type) {
     const { rows, days } = parseBinaryData(buffer, type === 'test');
     RAW_DATA[type] = rows;
 
-    // Update Days if Train
-    if (type === 'train') {
-        const dayArr = Array.from(days).sort();
-        document.getElementById('search-day').innerHTML = '<option value="">All Days</option>' + dayArr.map(d => `<option value="${d}">${d}</option>`).join('');
-    }
+    const dayArr = Array.from(days).sort();
+    document.getElementById('search-day').innerHTML = '<option value="">All Days</option>' + dayArr.map(d => `<option value="${d}">${d}</option>`).join('');
 
     log(`Loaded ${rows.length} tracks from ${type}.bin`, "text-green-400");
 
@@ -984,9 +981,9 @@ function selectTrack(track, openPanel = true) {
         x: track.coords.map(c => (c[0] - c0[0]) * 111139 * Math.cos(c0[1] * Math.PI / 180)),
         y: track.coords.map(c => (c[1] - c0[1]) * 111139),
         z: track.coords.map(c => c[2]),
-        customdata: track.times,
+        customdata: track.coords.map((coord, i) => [...coord, track.times[i]]),
         line: { width: 4, color: '#3b82f6' }, marker: { size: 2, color: track.coords.map(c => c[3]), colorscale: 'Viridis' },
-        hovertemplate: 'X: %{x:.1f}m<br>Y: %{y:.1f}m<br>Z: %{z:.1f}m<br>RCS: %{marker.color:.1f} dB<br>Time: %{customdata:.2f}s<extra></extra>'
+        hovertemplate: 'X: %{x:.1f}m<br>Y: %{y:.1f}m<br>Z: %{z:.1f}m<br>RCS: %{marker.color:.1f} dB/m2<br>Time: %{customdata[4]:.2f}s<br>Longitude: %{customdata[0]:.5f}<br>Latitude: %{customdata[1]:.5f}<extra></extra>'
     }], {
         margin: { t: 0, b: 0, l: 0, r: 0 }, paper_bgcolor: 'rgba(0,0,0,0)',
         scene: { xaxis: { title: 'X', color: '#94a3b8' }, yaxis: { title: 'Y', color: '#94a3b8' }, zaxis: { title: 'Z', color: '#94a3b8' }, aspectmode: 'data', camera: { eye: { x: 1.5, y: 1.5, z: 0.5 } } }
@@ -1234,7 +1231,7 @@ function setMapStyle(s) {
         ["btn-style-sat", s == 'satellite'],
         ["btn-style-sat-mobile", s == 'satellite']
     ])
-        document.getElementById(id).className = `btn ${set ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400"'}`;
+        document.getElementById(id).className = `btn ${set ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400"'}${id.includes("mobile") ? '' : ' hidden xl:flex'}`;
 
     if (VIEW_MODE == 'map' && DECK) DECK.setProps({ layers: [...getBaseLayers(), getPathLayer()] });
 }
