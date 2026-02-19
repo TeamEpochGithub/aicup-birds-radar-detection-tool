@@ -106,7 +106,7 @@ def filter(coords, times, meta):
 
 ### Standard Submission
 
-Upload a standard submission file to see your mAP score and visualize predicted classes vs ground truth.
+Upload a standard submission file to see your local mAP score and visualize predicted classes vs ground truth.
 
 ```csv
 track_id,Clutter,Cormorants,Pigeons,Ducks,Geese,Gulls,Birds of Prey,Waders,Songbirds
@@ -123,6 +123,12 @@ track_id, ...[classes]... ,cluster_id,embedding_x,outlier_score
 12, ...[probs]... ,5,0.882,-1.2
 
 ```
+
+### Train rows
+
+The submission csv for the website can contain extra rows of the train set, this lets you calculate your local mAP score.
+Rember that such a enhanced submission csv is invalid for kaggle. Ensure your pipeline creates a stripped submission csv with only probalities for the test data for Kaggle scoring.
+
 
 * These columns become accessible in the Python engine via `meta['cluster_id']`.
 

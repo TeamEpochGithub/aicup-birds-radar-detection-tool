@@ -291,7 +291,7 @@ function updateEngineStatus(engine) {
     if (el) el.innerText = `Engine: ${engine}`;
 }
 
-let didToldTheUserAboutPackagesForLocalServer = false
+let didToldTheUserAboutPackagesForLocalServer = false;
 
 /**
  * High-level Python Execution abstraction.
@@ -325,14 +325,14 @@ async function executePython(code, globals, funcName, params) {
             if (response.ok) {
                 const data = await response.json();
                 if (!didToldTheUserAboutPackagesForLocalServer)
-                    log("NOTE: Using your local python environment, please install packages locally using `uv add` they will not auto-install", "text-slate-300")
-                didToldTheUserAboutPackagesForLocalServer = true
+                    log("NOTE: Using your local python environment, please install packages locally using `uv add` they will not auto-install", "text-slate-300");
+                didToldTheUserAboutPackagesForLocalServer = true;
 
                 updateEngineStatus("Local Server");
                 if (data.stdout)
-                    log(data.stdout, "text-slate-300")
+                    log(data.stdout, "text-slate-300");
                 if (data.stderr)
-                    log(data.stderr, "text-red-400")
+                    log(data.stderr, "text-red-400");
                 return data.result;
             }
         } catch (e) {
