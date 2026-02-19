@@ -54,7 +54,9 @@ Required files to statically serve:
 - test.bin (optional)
 - debug_introduction_notebook_submission.csv (optional)
 
-This is used at [https://birds.teamepoch.ai](https://birds.teamepoch.ai). It can be embeded in another site by appending `?embed=true` to the URL, the embedded variant only has a subset of the features (no python, no grid i.e only map, no features, no test set).
+This is used at [https://birds.teamepoch.ai](https://birds.teamepoch.ai). 
+
+For embedding the site see [embedding.md](embedding.md)
 
 ## Python API Guide
 
