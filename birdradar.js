@@ -414,9 +414,6 @@ async function init() {
             document.body.classList.add('embed-mode');
             document.getElementById('embed-controls').classList.remove('hidden');
             document.getElementById('embed-filter-overlay').classList.remove('hidden');
-            setTimeout(() => {
-                document.getElementById('embed-search-class').innerHTML = document.getElementById('search-class').innerHTML;
-            }, 500);
         } else {
             if (!localStorage.getItem('bd_tutorial_seen')) {
                 document.getElementById('help-modal').style.display = 'block';
@@ -439,6 +436,11 @@ async function init() {
             setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
         } else {
             document.getElementById('loader').style.display = 'none';
+
+            setTimeout(() => {
+                document.getElementById('embed-search-class').innerHTML = document.getElementById('search-class').innerHTML;
+                document.getElementById('embed-search-day').innerHTML = document.getElementById('search-day').innerHTML;
+            }, 500);
         }
 
     } catch (e) { document.getElementById('loader-text').innerHTML = `<span class="text-red-400">${e.message}</span>`; }
