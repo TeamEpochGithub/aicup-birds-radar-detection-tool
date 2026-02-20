@@ -166,6 +166,10 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ## License
 
-Source code is licensed under [MIT](https://choosealicense.com/licenses/mit/)
+* Source code is licensed under [MIT](https://choosealicense.com/licenses/mit/)
+* The train dataset falls under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) with the attribution 
+described in [LICENSE.md](LICENSE.md)
+* The test dataset falls under [AI Cup 2026 competition rules](https://www.kaggle.com/competitions/ai-cup-2026-performance/rules), please remove these files for any derivative work of this repository.
+* Reserved names are excluded from open source licenses
 
-The datasets are excluded from MIT and have their own conditions. Please see the [LICENSE](LICENSE) file
+See [LICENSE.md](LICENSE.md) for precise definitions

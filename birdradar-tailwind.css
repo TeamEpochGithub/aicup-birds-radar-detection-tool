@@ -185,6 +185,10 @@ body {
     @apply text-pink-400 font-mono;
 }
 
+.link-text {
+    @apply text-blue-400 underline hover:text-blue-300;
+}
+
 body {
     background: #0f172a;
     color: #cbd5e1;

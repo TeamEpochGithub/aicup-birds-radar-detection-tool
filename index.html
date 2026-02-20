@@ -49,13 +49,12 @@
             </div>
             <div class="modal-inner space-y-4 text-sm leading-relaxed p-4 md:p-8 text-slate-300">
                 <p>You are about to access the <b>Test Set</b> or related features.</p>
-                <p>This dataset is part of the <a
-                        href="https://www.kaggle.com/competitions/ai-cup-2026-performance/rules" target="_blank"
-                        class="text-blue-400 underline">AI Cup 2026</a>. By proceeding, you agree that:</p>
+                <p>This dataset is part of the <a href="https://www.kaggle.com/competitions/ai-cup-2026-performance"
+                        target="_blank" class="text-blue-400 underline">AI Cup 2026</a>. By proceeding, you agree that:
+                </p>
                 <ul class="list-disc pl-5 space-y-2 text-slate-400">
                     <li>You will use the Test Set solely for the purpose of the competition.</li>
                     <li>Manual labeling of the test set is strictly prohibited.</li>
-                    <li>You will not reverse engineer or attempt to de-anonymize the data.</li>
                     <li>You accept the rules of the competition at <a
                             href="https://www.kaggle.com/competitions/ai-cup-2026-performance/rules" target="_blank"
                             class="text-blue-400 underline">https://www.kaggle.com/competitions/ai-cup-2026-performance/rules</a></a>
@@ -84,41 +83,45 @@
                     class="text-slate-400 hover:text-white text-3xl">&times;</button>
             </div>
 
-            <div class="modal-inner space-y-8 text-sm leading-relaxed p-4 md:p-8">
+            <div class="modal-inner space-y-8 text-sm leading-relaxed p-4 md:p-8 overflow-y-auto">
+
                 <section>
                     <h3 class="text-blue-400 font-bold text-lg mb-3 border-b border-slate-700 pb-1">1. About This Tool
                     </h3>
-                    <p class="text-slate-300 mb-2">
-                        This is an interactive Feature Engineering &amp; Error Analysis tool for the <a
+                    <p class="text-slate-300">
+                        This is an interactive visualization and Feature Engineering tool for the <a
                             href="https://www.teamepoch.ai/ai-cup-2026/challenge-center/" target="_blank"
                             class="text-blue-400 underline hover:text-blue-300">AI Cup 2026: Bird Track Radar
-                            Challenge</a>.
-                    </p>
-                    <p class="text-slate-400 text-xs">
-                        The goal is to classify radar tracks into bird species. Github <a
-                            href="https://github.com/TeamEpochGithub/aicup-birds-radar-detection-tool" target="_blank"
-                            class="text-blue-400 underline hover:text-blue-300">https://github.com/TeamEpochGithub/aicup-birds-radar-detection-tool</a>,
-                        licensed under MIT
+                            Challenge</a>. It allows you to explore bird flight paths and debug AI models directly in
+                        your browser.
                     </p>
                 </section>
 
                 <section>
-                    <h3 class="text-blue-400 font-bold text-lg mb-3 border-b border-slate-700 pb-1">2. Data &amp;
-                        Loading</h3>
-                    <ul class="list-disc pl-5 space-y-1 text-slate-300">
-                        <li><b>Auto-Load:</b> The app tries to fetch <code>train.csv</code> and <code>test.csv</code>
-                            automatically (cached in your browser for instant reloads).</li>
-                        <li><b>Manual Load:</b> Drag-and-drop your own files via the <b>📂 CSV</b> button.</li>
-                        <li><b>The Data:</b> Each "track" is a sequence of 3D points [Longitude, Latitude, Altitude]
-                            plus RCS (Radar Cross Section) recorded over time.</li>
+                    <h3 class="text-blue-400 font-bold text-lg mb-3 border-b border-slate-700 pb-1">2. Interface &
+                        Navigation</h3>
+                    <ul class="list-disc pl-5 space-y-2 text-slate-300">
+                        <li><b>3D Map:</b> Displays flight paths over Eemshaven. <b>Left-click & drag</b> to pan.
+                            <b>Right-click & drag</b> to tilt and rotate the 3D camera.
+                        </li>
+                        <li><b>Track Details:</b> Click any colored track on the map to open the Analysis Panel. This
+                            shows the specific 3D altitude profile and Radar Cross Section (RCS) of that bird.</li>
+                        <li><b>Grid View:</b> Toggle between "Map" and "Grid" in the top right to view tracks as a
+                            sortable table.</li>
+                        <li><b>Filtering:</b> Use the left sidebar to search for specific Track IDs, filter by Bird
+                            Species, or isolate specific days.</li>
+                        <li><b>The Data:</b> Each radar "track" is a series of measurements containing 4 elements:
+                            <i>Longitude, Latitude, Altitude (m), and Radar Cross Section (dB)</i>.
+                        </li>
                     </ul>
                 </section>
 
                 <section>
                     <h3 class="text-blue-400 font-bold text-lg mb-3 border-b border-slate-700 pb-1">3. Feature
-                        Calculator (Python)</h3>
+                        Calculator & Filters (Python)</h3>
                     <p class="mb-4 text-slate-300">
-                        Write Python code in the left sidebar to extract features or filter data.
+                        You can write Python code in the left sidebar to extract features or filter the dataset in
+                        real-time.
                     </p>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -135,16 +138,17 @@
                                 </li>
                                 <li>
                                     <div class="font-bold text-white">meta (dict)</div>
-                                    Contains CSV columns: <code>airspeed</code>, <code>radar_bird_size</code>, plus any
-                                    injected debug columns.
-                                    <br><span class="text-green-400">meta['is_test']</span> is True for test set tracks.
+                                    Contains CSV columns: <code>airspeed</code>, <code>radar_bird_size</code>, plus
+                                    injected debug columns. <span class="text-green-400">meta['is_test']</span> is True
+                                    for test set tracks.
                                 </li>
                             </ul>
                         </div>
 
                         <div class="bg-slate-800 p-4 rounded border border-slate-600 flex flex-col">
-                            <div class="text-xs font-bold text-green-400 mb-2 uppercase">Return Value</div>
-                            <p class="text-xs text-slate-300 mb-2">Your function must return a flat <b>Dictionary</b> of
+                            <div class="text-xs font-bold text-green-400 mb-2 uppercase">Return Value for features</div>
+                            <p class="text-xs text-slate-300 mb-2">Your function must be named <b>calculate</b> and
+                                return a flat <b>Dictionary</b> of
                                 numbers. These become <span class="text-green-400">Green Columns</span> in the Grid.</p>
                             <pre class="bg-slate-900 p-2 rounded text-[10px] text-green-300 font-mono overflow-x-auto">def calculate(coords, times, meta):
     import numpy as np
@@ -152,51 +156,52 @@
     return {
         "max_height": float(np.max(z)),
         "duration": float(times[-1] - times[0]),
-        "my_custom_metric": meta['airspeed'] * 2
+        "metric": meta['airspeed'] * 2
     }</pre>
+                            <br>
+                            <div class="text-xs font-bold text-green-400 mb-2 uppercase">Return Value for filter</div>
+                            <p class="text-xs text-slate-300 mb-2">Your function must be named <b>filter</b> and return
+                                <b>True</b> to keep the track and <b>False</b> to hide the track
+                            </p>
                         </div>
                     </div>
                 </section>
 
                 <section>
-                    <h3 class="text-blue-400 font-bold text-lg mb-3 border-b border-slate-700 pb-1">4. Submissions &amp;
+                    <h3 class="text-blue-400 font-bold text-lg mb-3 border-b border-slate-700 pb-1">4. Submissions &
                         Debugging</h3>
                     <p class="mb-3 text-slate-300">
-                        Upload your local <code>submission.csv</code> to overlay predictions on the map and calculate
-                        mAP (Mean Average Precision).
+                        Upload your local <code>submission.csv</code> (via the 📤 Submission button) to overlay your AI
+                        predictions on the map and calculate your local mAP score.
                     </p>
 
                     <div
                         class="bg-slate-900 p-4 rounded border border-slate-700 font-mono text-xs overflow-x-auto mb-4">
-                        <div class="mb-2 text-slate-500 uppercase font-bold">Standard Format</div>
-                        <div class="text-slate-300">track_id, Clutter, Ducks, Geese, ... (probabilities)</div>
-
-                        <div class="mt-4 mb-2 text-pink-400 uppercase font-bold">Debug / Enhanced Format</div>
-                        <div class="text-slate-300">track_id, Clutter, ..., <span class="text-pink-400">cluster_id,
-                                embedding_x, local_outlier_factor</span></div>
+                        <div class="mb-1 text-slate-500 uppercase font-bold">Standard Kaggle Format</div>
+                        <div class="text-slate-300 mb-3">track_id, Clutter, Ducks, Geese, ... (probabilities)</div>
+                        <div class="mb-1 text-pink-400 uppercase font-bold">Debug / Enhanced Format (For this tool)
+                        </div>
+                        <div class="text-slate-300">track_id, Clutter, ..., <span class="text-pink-400">cv_fold,
+                                embedding_x</span></div>
                     </div>
 
                     <ul class="list-disc pl-5 space-y-2 text-slate-300 text-xs">
-                        <li><b>Important:</b> The <code>submission.csv</code> you upload here can be a <b>Superset</b>
-                            of the Kaggle submission. It can contain tracks from <code>train.csv</code> (for local
-                            hold-out validation) and does not need to be limited to just the test set.</li>
-                        <li><b>Debug Columns:</b> Any extra columns in your submission file are automatically detected
-                            as <span class="text-pink-400 font-bold">Pink Columns</span> in the Grid View. Debug columns
-                            are <b>invalid</b> for kaggle submissions.</li>
-                        <li>These values are injected into the <code>meta</code> dictionary (e.g.,
-                            <code>meta['cluster_id']</code>), allowing you to visualize your local training pipeline's
-                            internal state.
+                        <li><b>Superset Submissions:</b> Your uploaded CSV can contain tracks from
+                            <code>train.csv</code> (for local hold-out validation) alongside test tracks.
                         </li>
-                        <li><b>Test Set:</b> Since ground truth is unknown for the test set, uploading a submission
-                            allows the tool to use your <b>Predicted Class</b> as the label for visualization and
-                            filtering.</li>
-                        <li><i>TIP: generate two submission files from your pipeline: 1. for kaggle and 2 that contains
-                                train and debug info for the bird radar site.</i></li>
-                        <li><i>The Epoch website executes the python in your browser. If you want to use your local
-                                python environment, please install the tool from <a
+                        <li><b>Debug Columns:</b> Any extra columns in your submission file are automatically rendered
+                            as <span class="text-pink-400 font-bold">Pink Columns</span> in the Grid View. These values
+                            are injected into the Python <code>meta</code> dictionary so you can filter by them (e.g.,
+                            <code>meta['cv_fold'] == 1</code>).
+                        </li>
+                        <li><i>Note: If you want to use your local Python environment instead of your browser's CPU,
+                                install the local server version from <a
                                     href="https://github.com/TeamEpochGithub/aicup-birds-radar-detection-tool"
-                                    target="_blank" class="text-blue-400 underline hover:text-blue-300">Github</a></i>
+                                    target="_blank" class="text-blue-400 underline hover:text-blue-300">Github</a>.</i>
                         </li>
+                        <li><b>mAP score:</b> The average precision score is only calculated over the train tracks if
+                            provided. To
+                            calculate the test track, for the public leaderboard, you must submit it on Kaggle</li>
                     </ul>
                 </section>
 
@@ -206,18 +211,42 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300">
                         <div>
                             <b class="text-white block mb-1">Class Boxplots</b>
-                            Runs your Python feature calculator against the entire dataset and plots distribution
-                            boxplots for every returned feature, grouped by Bird Species. Useful for finding features
-                            that separate classes well.
+                            Runs your Python feature calculator against the dataset and plots distribution boxplots
+                            grouped by Bird Species. Useful for finding features that separate classes well.
                         </div>
                         <div>
                             <b class="text-white block mb-1">Train/Test Overlap</b>
                             Plots histograms comparing the distribution of your features in Train vs. Test sets. Crucial
-                            for detecting <b>Covariate Shift</b> (e.g., finding if test birds fly higher/slower than
-                            training birds).
+                            for detecting <b>Covariate Shift</b>.
                         </div>
                     </div>
                 </section>
+
+                <section class="mt-8 pt-4 border-t border-slate-800">
+                    <h3 class="text-slate-500 font-bold text-xs mb-2 uppercase tracking-wider">Credits & Licenses</h3>
+                    <ul class="list-disc pl-5 space-y-1 text-slate-400 text-[11px]">
+                        <li>The competition AI Cup 2026 is hosted and organized by <a href="https://aic4nl.nl/en/"
+                                class="text-blue-400 underline">AIC4NL</a> and <a href="https://teamepoch.ai/"
+                                class="text-blue-400 underline">Team Epoch</a></li>
+                        <li>Application source code and introduction workshop are licensed under the <a
+                                href="https://choosealicense.com/licenses/mit/" class="text-blue-400 underline"
+                                target="_blank">MIT License</a>.</li>
+                        <li>Train dataset is provided by TNO (Netherlands Organisation for Applied Scientific Research)
+                            and licensed under <a href="https://creativecommons.org/licenses/by-nc/4.0/"
+                                class="text-blue-400 underline" target="_blank">CC BY-NC 4.0</a>.</li>
+                        <li>Test dataset is licensed under <a
+                                href="https://www.kaggle.com/competitions/ai-cup-2026-performance/rules"
+                                class="text-blue-400 underline" target="_blank">AI Cup 2026 Competition Rules</a> and
+                            strictly limited to competition use.</li>
+                        <li>'Satellite' map provided by <a href="https://www.pdok.nl/" class="text-blue-400 underline"
+                                target="_blank">PDOK</a>, licensed under <a
+                                href="https://creativecommons.org/licenses/by/4.0/" target="_blank"
+                                class="text-blue-400 underline">CC BY 4.0</a>.</li>
+                        <li>'Light' map tiles provided by <a href="https://basemaps.cartocdn.com/"
+                                class="text-blue-400 underline" target="_blank">Carto CDN</a>.</li>
+                    </ul>
+                </section>
+
             </div>
 
             <div class="p-4 bg-slate-800 border-t border-slate-700 flex justify-end">
@@ -258,29 +287,32 @@
                 title="Toggle sidebar">≡</button>
             <h1 class="text-xl font-bold text-blue-400 whitespace-nowrap truncate">Bird track radar</h1>
 
-            <div class="flex items-center bg-slate-800 rounded p-1 border border-slate-600 gap-2 embed-hidden">
+            <div
+                class="hidden md:flex items-center bg-slate-800 rounded p-1 border border-slate-600 gap-2 embed-hidden">
                 <select id="dataset-select" class="bg-transparent text-sm text-slate-300 outline-none px-2"
                     onchange="switchDataset()">
                     <option value="train">Train Set</option>
                     <option value="test">Test Set</option>
                 </select>
-                <div class="h-4 w-px bg-slate-600 desktop-only"></div>
-                <div class="btn-file btn text-[10px] desktop-only"><span>📂 Upload CSV</span><input type="file"
-                        accept=".csv" onchange="handleFileUpload(this, 'data')"></div>
-                <div class="btn-file btn text-[10px] desktop-only"><span>📤 Submission</span><input type="file"
-                        accept=".csv" onchange="handleFileUpload(this, 'sub')"></div>
-                <div class="btn btn-purple text-[10px] desktop-only" onclick="loadSampleSubmission()"><span>📄
-                        Introduction Notebook Submission</span></div>
+                <div class="h-4 w-px bg-slate-600"></div>
+                <div class="btn-file btn text-[10px]"><span>📂 Upload dataset</span><input type="file" accept=".csv"
+                        onchange="handleFileUpload(this, 'data')"></div>
+                <div class="btn-file btn text-[10px]"><span>📤 Upload Submission</span><input type="file" accept=".csv"
+                        onchange="handleFileUpload(this, 'sub')"></div>
+                <div class="btn btn-purple text-[10px] hidden xl:flex" onclick="loadSampleSubmission()">
+                    <span>📄
+                        Introduction Notebook Submission</span>
+                </div>
 
                 <div id="filter-status"
-                    class="hidden px-3 py-1 bg-slate-700 border border-slate-600 text-slate-200 text-xs rounded flex items-center gap-2">
+                    class="px-3 py-1 bg-slate-700 border border-slate-600 text-slate-200 text-xs rounded items-center gap-2 hidden xl:flex">
                     <span id="filter-badges" class="flex gap-2"></span>
                     <button onclick="clearFilter()" class="text-slate-400 hover:text-white font-bold ml-1">×</button>
                 </div>
             </div>
 
             <div id="sub-filter-container"
-                class="hidden flex items-center gap-2 px-3 py-1 bg-slate-800 border border-slate-600 rounded embed-hidden">
+                class="hidden items-center gap-2 px-3 py-1 bg-slate-800 border border-slate-600 rounded embed-hidden">
                 <input type="checkbox" id="limit-to-sub" onchange="applySimpleFilters()"
                     class="w-3 h-3 accent-purple-500">
                 <label for="limit-to-sub" class="text-[10px] text-slate-400 font-bold uppercase cursor-pointer">Only
@@ -375,6 +407,31 @@
                     </button>
                 </div>
 
+                <div class="space-y-2 embed-hidden">
+                    <select id="dataset-select"
+                        class="bg-transparent text-sm text-slate-300 outline-none px-2 md:hidden"
+                        onchange="switchDataset()">
+                        <option value="train">Train Set</option>
+                        <option value="test">Test Set</option>
+                    </select>
+                    <hr class="border-slate-700 md:hidden">
+                    <div class="btn-file btn text-[10px] md:hidden"><span>📂 Upload dataset</span><input type="file"
+                            accept=".csv" onchange="handleFileUpload(this, 'data')"></div>
+                    <hr class="border-slate-700 md:hidden">
+                    <div class="btn-file btn text-[10px] md:hidden"><span>📤 Upload Submission</span><input type="file"
+                            accept=".csv" onchange="handleFileUpload(this, 'sub')"></div>
+                    <hr class="border-slate-700 md:hidden">
+                    <div class="btn btn-purple text-[10px] ml-4 max-w-xs" onclick="loadSampleSubmission()"><span>📄
+                            Introduction Notebook Submission</span></div>
+                    <hr class="border-slate-700 md:hidden">
+
+                    <div id="filter-status-mobile"
+                        class="hidden px-3 py-1 bg-slate-700 border border-slate-600 text-slate-200 text-xs rounded flex items-center gap-2 xl:hidden">
+                        <span id="filter-badges-mobile" class="flex gap-2"></span>
+                        <button onclick="clearFilter()"
+                            class="text-slate-400 hover:text-white font-bold ml-1">×</button>
+                    </div>
+                </div>
             </nav>
 
             <div class="p-3 border-b border-slate-700 flex gap-2 flex-wrap">
@@ -386,6 +443,13 @@
                 <select id="search-day"
                     class="flex-1 bg-slate-900 border border-slate-600 rounded px-3 py-1 text-sm text-white outline-none"
                     onchange="applySimpleFilters()"></select>
+                <div id="sub-filter-container-mobile"
+                    class="hidden flex xl:hidden items-center gap-2 px-3 py-1 bg-slate-800 border border-slate-600 rounded embed-hidden">
+                    <input type="checkbox" id="limit-to-sub-mobile" onchange="document.getElementById('limit-to-sub').checked = this.checked; applySimpleFilters()"
+                        class="w-3 h-3 accent-purple-500">
+                    <label for="limit-to-sub-mobile" class="text-[10px] text-slate-400 font-bold uppercase cursor-pointer">Only
+                        Sub</label>
+                </div>
                 <button onclick="applySimpleFilters()" class="btn btn-blue">Filter</button>
             </div>
             <div class="flex border-b border-slate-700 bg-slate-900 text-xs font-bold text-slate-400">

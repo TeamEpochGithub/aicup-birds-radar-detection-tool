@@ -22,25 +22,40 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 
-DATA USE RESTRICTIONS & EXCEPTIONS
+DATA USE RESTRICTIONS ON TRAIN SET
 
 The MIT License above applies to the source code and documentation of this 
 repository. It DOES NOT apply to the dataset files included in this repository, 
 specifically:
 - train.csv
-- test.csv
 - train.bin
+
+These data files are licensed under:
+
+Creative Commons Attribution-NonCommercial 4.0 International License with the following attribution
+
+Copyright (c) 2026 AI Cup 2026, AIC4NL | Team Epoch
+Dataset provided by TNO (Netherlands Organisation for Applied Scientific Research)
+
+This attribution and the license shall be included in any derivative work of the train dataset.
+
+To view a copy of this license, visit
+https://creativecommons.org/licenses/by-nc/4.0/
+
+--------------------------------------------------------------------------------
+
+DATA USE RESTRICTIONS ON TEST SET
+
+The MIT License above applies to the source code and documentation of this 
+repository. It DOES NOT apply to the train files included in this repository, 
+specifically:
+- test.csv
 - test.bin
-- introduction_notebook_submission.csv
+- debug_introduction_notebook_submission.csv
 
-These data files are the property of TNO (Netherlands Organisation for Applied 
-Scientific Research) and are provided subject to the following strict conditions:
+These fall under the following conditiions:
 
-1. ACADEMIC & NON-COMMERCIAL USE ONLY
-   The data may only be used for academic and non-commercial purposes. 
-   Commercial use is strictly prohibited.
-
-2. COMPETITION RULES FOR TEST SET
+1. COMPETITION RULES FOR TEST SET
    Access to and use of the test set (`test.csv`, `test.bin`, `debug_introduction_notebook_submission.csv`) is strictly 
    conditional upon agreeing to the terms and rules of the AI Cup 2026 – 
    Performance Track competition. By accessing these files, you acknowledge 
@@ -49,24 +64,19 @@ Scientific Research) and are provided subject to the following strict conditions
 
    This condition holds until the data is explicitly revealed by the compeition organizers.
 
-3. NO REVERSE ENGINEERING OF TEST SET
+2. NO REVERSE ENGINEERING OF TEST SET
    You may not attempt to reverse engineer, de-anonymize, or manually label 
    the test set data. (`test.csv`, `test.bin`, `debug_introduction_notebook_submission.csv`)
 
-   You agree that you use the test data only to calculate, submit and debug submissions for the AI Cup 2026 competition only until the test data, if it happens, is revealed by the competition organizers.
+   You agree that you use the test data only to calculate, submit and debug submissions for the 
+   AI Cup 2026 competition only until the test data, if it happens, is revealed by the competition organizers.
 
-4. ATTRIBUTION REQUIREMENT
-   Any use, modification, or distribution of the dataset must include
-   clear attribution to the original author:
+3. NOT SHARED OUTSIDE THE COMPETITION
+   If you copy, merge, publish, distribute and/or sublicense copies of the test datset, 
+   that would violate the competition rules (such as sharing outside the kaggle system)
+   you should remove the specified files belonging to the test set.
 
-   © 2026 AI Cup 2026, AIC4NL | Team Epoch
-   Dataset provided by TNO (Netherlands Organisation for Applied Scientific Research)
-
-   Attribution must be visible in:
-   - Source code distributions (in the LICENSE file), and
-   - End-user applications (e.g., in an "About", documentation, or credits section), if applicable.
-
-5. DISCLAIMER
+4. DISCLAIMER
    THE DATASET IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -74,7 +84,7 @@ Scientific Research) and are provided subject to the following strict conditions
    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
    OUT OF OR IN CONNECTION WITH THE DATASET OR THE USE OR OTHER DEALINGS IN THE
    DATASET.
-
+   
 --------------------------------------------------------------------------------
 
 TRADEMARK & ASSET RESTRICTIONS

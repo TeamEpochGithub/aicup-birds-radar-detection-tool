@@ -725,9 +725,10 @@ function parseSubmission(text) {
             ['train', 'test'].forEach(ds => {
                 if (RAW_DATA[ds]) RAW_DATA[ds].forEach(t => { if (SUBMISSION[t.id]) t.meta = { ...t.meta, ...SUBMISSION[t.id].debug }; });
             });
-            document.getElementById('sub-filter-container').classList.remove('hidden');
+            document.getElementById('sub-filter-container').classList.add('xl:flex');
+            document.getElementById('sub-filter-container-mobile').classList.remove('hidden');
             log(`Submission loaded: ${Object.keys(SUBMISSION).length} entries.`, "text-purple-400");
-            if (document.getElementById('dataset-select').value === 'train') calculateScore();
+            calculateScore();
             applySimpleFilters();
         }
     });
@@ -790,18 +791,25 @@ function applySimpleFilters() {
 
     if (SORT_COL) sortData(SORT_COL, false);
 
-    const filterContainer = document.getElementById('filter-status');
-    const badges = document.getElementById('filter-badges');
-    let badgeHtml = '';
     let active = false;
 
-    if (PYTHON_FILTERED_IDS !== null) { badgeHtml += `<span class="bg-orange-900/80 px-2 py-0.5 rounded text-orange-200">Python Filter</span>`; active = true; }
-    if (sid || scls || sday || onlySub) { badgeHtml += `<span class="bg-blue-900/80 px-2 py-0.5 rounded text-blue-200">Simple Filter</span>`; active = true; }
+    for (const [filterContainerID, badgesID] of [
+        ['filter-status', 'filter-badges'],
+        ['filter-status-mobile', 'filter-badges-mobile']
+    ]) {
+        const filterContainer = document.getElementById(filterContainerID);
+        const badges = document.getElementById(badgesID);
+        let badgeHtml = '';
 
-    if (active) {
-        filterContainer.classList.remove('hidden');
-        badges.innerHTML = badgeHtml + `<span class="opacity-70 ml-1">(${ACTIVE_DATA.length})</span>`;
-    } else { filterContainer.classList.add('hidden'); }
+        if (PYTHON_FILTERED_IDS !== null) { badgeHtml += `<span class="bg-orange-900/80 px-2 py-0.5 rounded text-orange-200">Python Filter</span>`; active = true; }
+        if (sid || scls || sday || onlySub) { badgeHtml += `<span class="bg-blue-900/80 px-2 py-0.5 rounded text-blue-200">Simple Filter</span>`; active = true; }
+
+        const hiddenClass = filterContainerID.includes("mobile") ? "hidden" : "xl:hidden";
+        if (active) {
+            filterContainer.classList.remove(hiddenClass);
+            badges.innerHTML = badgeHtml + `<span class="opacity-70 ml-1">(${ACTIVE_DATA.length})</span>`;
+        } else { filterContainer.classList.add(hiddenClass); }
+    }
 
     const statsNotice = document.getElementById('stats-filter-notice');
     if (active && ACTIVE_DATA.length < RAW_DATA[ds].length) statsNotice.classList.remove('hidden');
