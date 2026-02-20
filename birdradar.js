@@ -130,6 +130,7 @@ let RAW_DATA = { train: [], test: [] }, SUBMISSION = {}, ACTIVE_DATA = [];
 let DECK = null, MAP_STYLE = 'satellite', EDITOR_MODE = 'feature', SELECTED_ID = null, VIEW_MODE = 'map';
 let TABLE_PAGE = 0, TABLE_LIMIT = 50, CUSTOM_COLS = [], DEBUG_COLS = [];
 let PYTHON_FILTERED_IDS = null;
+let didRunCalculateOnAllData = false;
 
 let SORT_COL = null, SORT_ASC = true;
 const IS_EMBED = new URLSearchParams(window.location.search).get('embed') === 'true';
@@ -140,6 +141,7 @@ editor.setTheme("ace/theme/twilight");
 editor.session.setMode("ace/mode/python");
 editor.setValue(localStorage.getItem('bd_code_feature') || TEMPLATES.feature, -1);
 editor.on('change', () => {
+    didRunCalculateOnAllData = false;
     if (EDITOR_MODE === 'feature') {
         localStorage.setItem('bd_code_feature', editor.getValue());
         document.getElementById('btn-update-detail').classList.remove('hidden');
@@ -337,7 +339,7 @@ async function executePython(code, globals, funcName, params) {
                 log(data.stderr, "text-red-400");
 
             if (!response.ok || data.error) {
-                if (!data.error) 
+                if (!data.error)
                     throw new Error("Server returned an error with status: " + response.statusText)
                 let err = new Error(data.error + (data.traceback ? "\n" + data.traceback : ""));
                 pythonErrored = true
@@ -345,9 +347,9 @@ async function executePython(code, globals, funcName, params) {
             }
 
             return data.result;
-            
+
         } catch (e) {
-            if (pythonErrored) 
+            if (pythonErrored)
                 throw e;
             console.warn("Local server connection failed, falling back to Pyodide.");
             console.warn(e);
@@ -632,6 +634,7 @@ function parseWkbHex(hex) {
 // --- STANDARD LOGIC ---
 
 function switchDataset() {
+    didRunCalculateOnAllData = false;
     const ds = document.getElementById('dataset-select').value;
     if (ds === 'test' && !TEST_SET_LOADED) {
         checkTermsAndLoadTest(() => {
@@ -756,8 +759,8 @@ def _calculate_score(y_true, y_score):
     return float(np.mean(aps)) if aps else 0.0`, {}, '_calculate_score', [y_t, y_s]));
         document.getElementById('score-status').classList.remove('hidden');
         document.getElementById('mAP-val').innerText = mAP.toFixed(4);
-    } catch (e) { 
-        console.error(e); 
+    } catch (e) {
+        console.error(e);
         log(String(e), "text-red-400");
     }
 }
@@ -820,7 +823,10 @@ function applySimpleFilters() {
     if (!IS_EMBED) runFeatureCalcOnPage();
 }
 
-function sortData(col, toggle = true) {
+async function sortData(col, toggle = true) {
+    if (CUSTOM_COLS.includes(col) && !didRunCalculateOnAllData)
+        await processAll()
+
     if (toggle) {
         if (SORT_COL === col) SORT_ASC = !SORT_ASC;
         else { SORT_COL = col; SORT_ASC = true; }
@@ -1061,34 +1067,51 @@ def _batch_runner(tracks, mode):
 \n\n${code}`, {}, '_batch_runner', [batch, funcName]))
 }
 
-async function runStats(mode) {
-    if (mode === 'overlap' && !TEST_SET_LOADED) { checkTermsAndLoadTest(() => runStats(mode)); return; }
-    const container = document.getElementById('stats-charts');
-    container.innerHTML = `<div class="col-span-2 text-center text-slate-400">Processing massive data... please wait...</div>`;
+async function processAll(mode = null, collect = false) {
+    let currentMode = document.getElementById('dataset-select').value;
+    if (!mode)
+        mode = currentMode;
 
-    const processAll = async (dataList) => {
+    document.getElementById('loader').style.display = 'flex';
+    document.getElementById('loader').style.opacity = '1';
+    document.getElementById('loader-text').innerText = `Processing features on the entire ${mode} dataset...`;
+    try {
+        const dataList = RAW_DATA[mode];
         const results = {};
-        const CHUNK_SIZE = 50; // VERY SAFE CHUNK SIZE to prevent OOM
+        const CHUNK_SIZE = 50;
         for (let i = 0; i < dataList.length; i += CHUNK_SIZE) {
             const chunk = dataList.slice(i, i + CHUNK_SIZE);
             const calcResults = await runBatchInPyodide(chunk, 'calculate');
             calcResults.forEach((res, idx) => {
                 if (!res) return;
                 const track = chunk[idx];
-                for (const [k, v] of Object.entries(res)) {
-                    if (typeof v === 'number') {
-                        if (!results[k]) results[k] = [];
-                        results[k].push({ val: v, group: track.predictedGroup || track.group });
+                track.calculated = res;
+                if (collect) {
+                    for (const [k, v] of Object.entries(res)) {
+                        if (typeof v === 'number') {
+                            if (!results[k]) results[k] = [];
+                            results[k].push({ val: v, group: track.predictedGroup || track.group });
+                        }
                     }
                 }
             });
         }
+        if (currentMode == mode) didRunCalculateOnAllData = true;
+        if (!collect) return;
         return results;
-    };
+    } finally {
+        document.getElementById('loader').style.display = 'none';
+    }
+}
+
+async function runStats(mode) {
+    if (mode === 'overlap' && !TEST_SET_LOADED) { checkTermsAndLoadTest(() => runStats(mode)); return; }
+    const container = document.getElementById('stats-charts');
+    container.innerHTML = `<div class="col-span-2 text-center text-slate-400">Processing massive data... please wait...</div>`;
 
     if (mode === 'class') {
         const data = RAW_DATA.train.length > 0 ? RAW_DATA.train : RAW_DATA.test;
-        const metrics = await processAll(data.slice(0, 1000));
+        const metrics = await processAll('train', true);
         container.innerHTML = '';
         for (const [feat, values] of Object.entries(metrics)) {
             const div = document.createElement('div');
@@ -1105,8 +1128,8 @@ async function runStats(mode) {
         setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 100);
 
     } else if (mode === 'overlap') {
-        const trainRes = await processAll(RAW_DATA.train.slice(0, 500));
-        const testRes = await processAll(RAW_DATA.test.slice(0, 500));
+        const trainRes = await processAll('train', true);
+        const testRes = await processAll('test', true);
         container.innerHTML = '';
         const keys = Object.keys(trainRes).filter(k => testRes[k]);
         for (const k of keys) {

@@ -25,7 +25,7 @@ SOFTWARE.
 DATA USE RESTRICTIONS ON TRAIN SET
 
 The MIT License above applies to the source code and documentation of this 
-repository. It DOES NOT apply to the dataset files included in this repository, 
+repository. It does not apply to the dataset files included in this repository, 
 specifically:
 - train.csv
 - train.bin
