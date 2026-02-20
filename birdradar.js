@@ -1357,7 +1357,7 @@ function selectTrack(track, openPanel = true) {
           colorscale: "Viridis",
         },
         hovertemplate:
-          "X: %{x:.1f}m<br>Y: %{y:.1f}m<br>Z: %{z:.1f}m<br>RCS: %{marker.color:.1f} dB/m2<br>Time: %{customdata[4]:.2f}s<br>Longitude: %{customdata[0]:.5f}<br>Latitude: %{customdata[1]:.5f}<extra></extra>",
+          "X: %{x:.1f}m<br>Y: %{y:.1f}m<br>Z: %{z:.1f}m<br>RCS: %{marker.color:.1f} dB/m2<br>Time: %{customdata[4]:.2f}s<br>Longitude: %{customdata[0]:.6f}<br>Latitude: %{customdata[1]:.6f}<extra></extra>",
       },
     ],
     {
