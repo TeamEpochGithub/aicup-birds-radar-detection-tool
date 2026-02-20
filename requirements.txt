@@ -1,0 +1,7 @@
+dotenv
+flask
+numpy
+pandas
+scikit-learn
+scipy
+shapely

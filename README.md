@@ -20,12 +20,40 @@ git clone https://github.com/TeamEpochGithub/aicup-birds-radar-detection-tool.gi
 cd aicup-birds-radar-detection-tool
 ```
 
-2. **Local Run:**
-You can locally run the website using the following command. In contrast to the public site, this will use your local python environment giving you better performance and library access.
+2. **Local Installation:**
+    1. [Astral's UV](https://docs.astral.sh/uv/)
 
-```bash
-uv run app.py
-```
+    ```bash
+    uv sync
+    uv run app.py
+    ```
+
+    2. [Anaconda](https://www.anaconda.com/download)
+
+    ```bash
+    conda create --prefix .venv python=3.14
+    conda activate ./.venv
+    pip3 install -r requirements.txt
+    python3 app.py
+    ```
+
+    3. Just python
+
+    ```bash
+    python3 -m venv .venv
+
+    # On macOS / Linux:
+    source venv/bin/activate
+
+    # On Windows (PowerShell):
+    .venv\Scripts\Activate.ps1
+
+    pip3 install -r requirements.txt
+
+    python3 app.py
+    ```
+
+3. **Open in your browser**
 
 You get an output as follow:
 ```text
@@ -36,13 +64,13 @@ Engine: Local Python execution enabled via /api/python
 ======================================================================
 ```
 
-Open the printed URL with token in your browser. Confirm that local python environment is used _Engine: Local Server_ in the status bar
+Open the printed URL with token in your browser. Confirm that local python environment is used _Engine: Local Server_ in the status bar.
 
-*NOTE*: The URL with token allows executing python with full privileges of your machine
+4. **Static site:**
 
-3. **Static site:**
+The app can also be hosted as static site (e.g using nginx, github pages). The python code will then be executed in the user's browser using Pyodide instead on the server, allowing it to be safely shared with other users.
 
-The app can also be hosted as static site (e.g using nginx, github pages). The python code will then not be executed on the server/machine but instead be run on Pyodide in the user's browser, this allows the tool to be safely shared with the public without risking a RCE. Performance is decent in pyodide but some advanced functionalities might be missing.
+Performance is decent in pyodide but some advanced python functionalities and libraries edge cases might not function.
 
 Required files to statically serve:
 - index.html (ensure / is served as index.html)
@@ -54,7 +82,7 @@ Required files to statically serve:
 - test.bin (optional)
 - debug_introduction_notebook_submission.csv (optional)
 
-This is used at [https://birds.teamepoch.ai](https://birds.teamepoch.ai). 
+This is used at [https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/](https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/). 
 
 For embedding the site see [embedding.md](embedding.md)
 
