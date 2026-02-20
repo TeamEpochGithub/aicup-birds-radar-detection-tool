@@ -668,7 +668,7 @@ function toggleSidebar() {
         sb.style.visibility = 'visible';
         sb.style.opacity = '100';
         sb.style.left = '0';
-        sb.style.setProperty('position', 'relative', 'important');
+        sb.style.removeProperty('position');
     }
 }
 

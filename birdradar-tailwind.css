@@ -353,6 +353,10 @@ body {
     #detail-panel.maximized #detail-plot {
         min-height: 300px;
     }
+
+    #terms-modal .modal-content {
+        height: auto;
+    }
 }
 
 @media (min-width: 1024px) {
