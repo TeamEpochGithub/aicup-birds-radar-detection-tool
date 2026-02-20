@@ -171,7 +171,8 @@ function parseWkb(bufferOrArray) {
     const hasZ = (type & 0x80000000) !== 0;
     const hasM = (type & 0x40000000) !== 0;
 
-    if (hasSRID) offset += 4;
+    if (hasSRID)
+        offset += 4;
 
     const numPoints = view.getUint32(offset, true); offset += 4;
     const coords = [];
@@ -180,8 +181,14 @@ function parseWkb(bufferOrArray) {
         const x = view.getFloat64(offset, true); offset += 8;
         const y = view.getFloat64(offset, true); offset += 8;
         let z = 0, m = 0;
-        if (hasZ) { z = view.getFloat64(offset, true); offset += 8; }
-        if (hasM) { m = view.getFloat64(offset, true); offset += 8; }
+        if (hasZ) {
+            z = view.getFloat64(offset, true);
+            offset += 8;
+        }
+        if (hasM) {
+            m = view.getFloat64(offset, true);
+            offset += 8;
+        }
         coords.push([x, y, z, m]);
     }
     return coords;
@@ -307,10 +314,10 @@ async function executePython(code, globals, funcName, params) {
         PYTHON_TOKEN = window.location.hash.substring(7);
         forced_token = true;
     } else if (localStorage.getItem('PYTHON_TOKEN'))
-        PYTHON_TOKEN = localStorage.getItem('PYTHON_TOKEN')
+        PYTHON_TOKEN = localStorage.getItem('PYTHON_TOKEN');
 
     if (PYTHON_TOKEN)
-        localStorage.setItem('PYTHON_TOKEN', PYTHON_TOKEN)
+        localStorage.setItem('PYTHON_TOKEN', PYTHON_TOKEN);
 
     let pythonErrored = false;
 
@@ -357,7 +364,9 @@ async function executePython(code, globals, funcName, params) {
             if (forced_token)
                 forced_token = e || forced_token;
             else {
-                try { localStorage.removeItem('PYTHON_TOKEN'); } catch { }
+                try {
+                    localStorage.removeItem('PYTHON_TOKEN');
+                } catch { }
             }
         }
     }
@@ -406,7 +415,15 @@ async function checkAndInstallImports(code) {
     const packages = [...code.matchAll(/^\s*(?:import|from)\s+([a-zA-Z0-9_\-]+)/gm)].map(m => m[1]);
     for (let pkg of packages) {
         if (['math', 'json', 'numpy', 'pandas', 'scipy', 'os', 'sys'].includes(pkg)) continue;
-        try { await PYODIDE.runPythonAsync(`import ${pkg}`); } catch (e) { try { await MICROPIP.install(pkg); } catch (err) { } }
+        try {
+            await PYODIDE.runPythonAsync(`import ${pkg}`);
+        } catch (e) {
+            try {
+                await MICROPIP.install(pkg);
+            } catch (err) {
+                console.warn(e, err);
+            }
+        }
     }
 }
 
@@ -445,7 +462,9 @@ async function init() {
             }, 500);
         }
 
-    } catch (e) { document.getElementById('loader-text').innerHTML = `<span class="text-red-400">${e.message}</span>`; }
+    } catch (e) {
+        document.getElementById('loader-text').innerHTML = `<span class="text-red-400">${e.message}</span>`;
+    }
 }
 
 async function loadBinary(type) {
@@ -493,7 +512,9 @@ async function runFeatureCalcForSelected() {
             document.getElementById('detail-features').innerHTML = html;
             document.getElementById('btn-update-detail').classList.add('hidden'); // Hide after update
         }
-    } catch (e) { document.getElementById('detail-features').innerHTML = `<span class="text-red-400 text-[10px]">${e.message}</span>`; }
+    } catch (e) {
+        document.getElementById('detail-features').innerHTML = `<span class="text-red-400 text-[10px]">${e.message}</span>`;
+    }
 }
 
 async function runPythonFilter() {
@@ -534,18 +555,14 @@ async function runFeatureCalcOnPage() {
     const start = TABLE_PAGE * TABLE_LIMIT;
     const tracks = ACTIVE_DATA.slice(start, start + TABLE_LIMIT);
 
-    // Only re-run if we don't have results or if explicit run requested (UI button)
-    // But user asked for: "execute immediately on new rendered table if rows do not have values OR code changed"
-    // Since we don't track "code changed" easily per-row, we just check if calculated is empty or if we are triggering manually.
-    // For now, let's run it.
-
     try {
         const results = await runBatchInPyodide(tracks, 'calculate');
         results.forEach((res, i) => { if (res) tracks[i].calculated = res; });
         if (tracks.length > 0) CUSTOM_COLS = Object.keys(tracks[0].calculated).filter(k => typeof tracks[0].calculated[k] !== 'object');
         renderView();
-        // log("Computation finished.", "text-green-400");
-    } catch (e) { log(e.message, "text-red-400"); }
+    } catch (e) {
+        log(e.message, "text-red-400");
+    }
 }
 
 function checkTermsAndLoadTest(callback) {
@@ -585,8 +602,11 @@ async function loadTestSet(callback) {
         await loadBinary('test');
         TEST_SET_LOADED = true;
         if (callback) callback();
-    } catch (e) { alert("Failed to load test set: " + e.message); }
-    finally { document.getElementById('loader').style.display = 'none'; }
+    } catch (e) {
+        alert("Failed to load test set: " + e.message);
+    } finally {
+        document.getElementById('loader').style.display = 'none';
+    }
 }
 
 // --- OLD CSV PARSER (Keep for manual upload) ---
@@ -601,7 +621,11 @@ function parseCSVContent(text, type) {
                 if (!coords || coords.length < 2) return;
 
                 let times = [];
-                try { times = JSON.parse(row['trajectory_time'].replace(/'/g, '"')); } catch (e) { times = coords.map((_, k) => k); }
+                try {
+                    times = JSON.parse(row['trajectory_time'].replace(/'/g, '"'));
+                } catch (e) {
+                    times = coords.map((_, k) => k);
+                }
 
                 const meta = { ...row, is_test: (type === 'test') };
                 // Ensure standard fields
@@ -745,7 +769,8 @@ async function calculateScore() {
         const y_true = train.map(d => groups.indexOf(d.meta.bird_group) !== -1 ? groups.indexOf(d.meta.bird_group) : -1);
         // Filter out Unknowns from GT
         const validIdx = y_true.map((v, i) => v !== -1 ? i : -1).filter(i => i !== -1);
-        if (validIdx.length === 0) return;
+        if (validIdx.length === 0)
+            return;
 
         const y_t = validIdx.map(i => y_true[i]);
         const y_s = validIdx.map(i => groups.map(g => SUBMISSION[train[i].id].scores[g]));
@@ -772,7 +797,10 @@ function applySimpleFilters() {
     const sday = document.getElementById('search-day').value;
     const onlySub = document.getElementById('limit-to-sub').checked;
 
-    if (!RAW_DATA[ds]) { ACTIVE_DATA = []; renderView(); return; }
+    if (!RAW_DATA[ds]) {
+        ACTIVE_DATA = [];
+        renderView(); return;
+    }
 
     ACTIVE_DATA = RAW_DATA[ds].filter(d => {
         if (PYTHON_FILTERED_IDS && !PYTHON_FILTERED_IDS.has(d.id)) return false;
@@ -804,14 +832,22 @@ function applySimpleFilters() {
         const badges = document.getElementById(badgesID);
         let badgeHtml = '';
 
-        if (PYTHON_FILTERED_IDS !== null) { badgeHtml += `<span class="bg-orange-900/80 px-2 py-0.5 rounded text-orange-200">Python Filter</span>`; active = true; }
-        if (sid || scls || sday || onlySub) { badgeHtml += `<span class="bg-blue-900/80 px-2 py-0.5 rounded text-blue-200">Simple Filter</span>`; active = true; }
+        if (PYTHON_FILTERED_IDS !== null) {
+            badgeHtml += `<span class="bg-orange-900/80 px-2 py-0.5 rounded text-orange-200">Python Filter</span>`;
+            active = true;
+        }
+        if (sid || scls || sday || onlySub) {
+            badgeHtml += `<span class="bg-blue-900/80 px-2 py-0.5 rounded text-blue-200">Simple Filter</span>`;
+            active = true;
+        }
 
         const hiddenClass = filterContainerID.includes("mobile") ? "hidden" : "xl:hidden";
         if (active) {
             filterContainer.classList.remove(hiddenClass);
             badges.innerHTML = badgeHtml + `<span class="opacity-70 ml-1">(${ACTIVE_DATA.length})</span>`;
-        } else { filterContainer.classList.add(hiddenClass); }
+        } else {
+            filterContainer.classList.add(hiddenClass);
+        }
     }
 
     const statsNotice = document.getElementById('stats-filter-notice');
@@ -825,7 +861,7 @@ function applySimpleFilters() {
 
 async function sortData(col, toggle = true) {
     if (CUSTOM_COLS.includes(col) && !didRunCalculateOnAllData)
-        await processAll()
+        await processAll();
 
     if (toggle) {
         if (SORT_COL === col) SORT_ASC = !SORT_ASC;
@@ -838,8 +874,12 @@ async function sortData(col, toggle = true) {
         else if (col === 'pts') { va = a.coords.length; vb = b.coords.length; }
         else if (CUSTOM_COLS.includes(col)) { va = a.calculated[col] || -99999; vb = b.calculated[col] || -99999; }
         else if (DEBUG_COLS.includes(col)) { va = a.meta[col] || -99999; vb = b.meta[col] || -99999; }
-        else { va = 0; vb = 0; }
-        if (typeof va === 'string') return SORT_ASC ? va.localeCompare(vb) : vb.localeCompare(va);
+        else {
+            va = 0;
+            vb = 0;
+        }
+        if (typeof va === 'string')
+            return SORT_ASC ? va.localeCompare(vb) : vb.localeCompare(va);
         return SORT_ASC ? va - vb : vb - va;
     });
     renderGrid();
@@ -1064,7 +1104,7 @@ def _batch_runner(tracks, mode):
             results.append(None)
     gc.collect()
     return json.dumps(results)
-\n\n${code}`, {}, '_batch_runner', [batch, funcName]))
+\n\n${code}`, {}, '_batch_runner', [batch, funcName]));
 }
 
 async function processAll(mode = null, collect = false) {
@@ -1188,7 +1228,10 @@ function renderGrid() {
     document.getElementById('table-stats').innerText = `Showing index ${start + 1} - ${Math.min(start + TABLE_LIMIT, ACTIVE_DATA.length)} of ${ACTIVE_DATA.length}`;
 }
 
-function selectTrackByID(id) { const t = ACTIVE_DATA.find(x => x.id === id); if (t) selectTrack(t, true); } // Grid click -> Open Panel
+function selectTrackByID(id) {
+    const t = ACTIVE_DATA.find(x => x.id === id); if (t) selectTrack(t, true);
+} // Grid click -> Open Panel
+
 function changeTablePage(dir) {
     const next = TABLE_PAGE + dir;
     if (next >= 0 && next * TABLE_LIMIT < ACTIVE_DATA.length) {
@@ -1198,34 +1241,34 @@ function changeTablePage(dir) {
     }
 }
 
-let log_count = 0
-let last_log = 0
-let did_msg_exhausted = false
+let log_count = 0;
+let last_log = 0;
+let did_msg_exhausted = false;
 
 function log(txt, cls) {
-    txt = String(txt).trim()
+    txt = String(txt).trim();
 
     let now = performance.now();
     let time_since_last_log = now - last_log;
-    let rem = time_since_last_log / 100
+    let rem = time_since_last_log / 100;
     if (rem >= log_count)
-        log_count = 0
+        log_count = 0;
     else
-        log_count -= rem
-    last_log = now
+        log_count -= rem;
+    last_log = now;
 
     for (let msg of String(txt).split('\n')) {
-        msg = msg.trim()
-        if (!msg) return
+        msg = msg.trim();
+        if (!msg) return;
 
         if (log_count > 100) {
             if (did_msg_exhausted) return
             msg = "... [Truncated print statements for performance] ..."
-            did_msg_exhausted = true
+            did_msg_exhausted = true;
         } else
-            did_msg_exhausted = false
+            did_msg_exhausted = false;
 
-        let max_len = 256 + ((100 - log_count) * 100)
+        let max_len = 256 + ((100 - log_count) * 100);
         if (msg > max_len)
             msg = msg.slice(0, max_len) + "..."
 
