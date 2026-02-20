@@ -1179,58 +1179,6 @@ function initMap() {
   });
 }
 
-function getOpenFreeMapBuildings() {
-  return new MVTLayer({
-    id: "open-free-map-buildings",
-    // Free, keyless vector tiles from OpenFreeMap
-    data: "https://tiles.openfreemap.org/planet/{z}/{x}/{y}.mvt",
-
-    minZoom: 13,
-    maxZoom: 14, // Cap zoom to avoid over-fetching
-
-    // IMPORTANT: Explain to deck.gl how to read this specific data structure
-    // The building data is usually in a layer named 'building'
-    renderSubLayers: (props) => {
-      if (!props.data) return null;
-
-      // Filter: only draw features that are actually buildings
-      const buildingsData = props.data.filter(
-        (f) =>
-          f.properties.layer === "building" ||
-          f.properties.class === "building",
-      );
-
-      return new PolygonLayer(props, {
-        id: `${props.id}-polygons`,
-        data: buildingsData,
-
-        // 1. Get the polygon shape
-        getPolygon: (d) => d.geometry.coordinates,
-
-        // 2. Extrude it to make it 3D
-        extruded: true,
-        wireframe: true,
-
-        // 3. Calculate Height (approximate if data is missing)
-        getElevation: (d) => {
-          // OSM data often has 'render_height', 'height', or 'levels'
-          return (
-            d.properties.render_height ||
-            d.properties.height ||
-            d.properties.render_min_height + 10 ||
-            15
-          );
-        },
-
-        // Visuals
-        getFillColor: [200, 200, 200, 200], // Light Grey
-        getLineColor: [100, 100, 100],
-        lineWidthMinPixels: 1,
-      });
-    },
-  });
-}
-
 /**
  * HIGH-RES DUTCH AERIAL MAP (PDOK)
  * We use the WMTS service which is much faster and compatible with TileLayer
