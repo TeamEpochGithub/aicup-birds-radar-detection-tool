@@ -444,7 +444,7 @@ async function executePython(code, globals, funcName, params) {
       let url = `/api/python?token=${PYTHON_TOKEN}`;
       try {
         url = new URL(PYTHON_TOKEN).toString();
-      } catch {}
+      } catch { }
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -485,7 +485,7 @@ async function executePython(code, globals, funcName, params) {
       else {
         try {
           localStorage.removeItem("PYTHON_TOKEN");
-        } catch {}
+        } catch { }
       }
     }
   }
@@ -493,9 +493,9 @@ async function executePython(code, globals, funcName, params) {
   if (forced_token)
     throw new Error(
       "Failed to access the local python API, remove #token= to fallback to pyodide" +
-        (forced_token && typeof forced_token != "boolean"
-          ? ", error: " + String(forced_token)
-          : ""),
+      (forced_token && typeof forced_token != "boolean"
+        ? ", error: " + String(forced_token)
+        : ""),
       {
         cause:
           forced_token && typeof forced_token != "boolean"
@@ -1084,6 +1084,9 @@ function applySimpleFilters() {
 
   TABLE_PAGE = 0;
   renderView();
+
+  if (ACTIVE_DATA.length == 1) selectTrack(ACTIVE_DATA[0], true);
+
   if (!IS_EMBED) runFeatureCalcOnPage();
 }
 
@@ -1152,7 +1155,14 @@ function fitMapToData(rows) {
       pitch: 45,
       bearing: 0,
     },
-    controller: { minZoom: 9 },
+    controller: {
+      dragRotate: true,
+      touchRotate: true,
+      touchZoom: true,
+      doubleClickZoom: true,
+      inertia: true,
+      minZoom: 9
+    },
   });
 }
 
@@ -1166,7 +1176,14 @@ function initMap() {
       pitch: 50,
       bearing: 0,
     },
-    controller: true,
+    controller: {
+      dragRotate: true,
+      touchRotate: true,
+      touchZoom: true,
+      doubleClickZoom: true,
+      inertia: true,
+      minZoom: 9
+    },
     layers: [...getBaseLayers(), getPathLayer()],
 
     // ADD THIS BLOCK:
@@ -1684,10 +1701,18 @@ function setMapStyle(s) {
     DECK.setProps({ layers: [...getBaseLayers(), getPathLayer()] });
 }
 function clearFilter() {
-  document.getElementById("limit-to-sub").checked = false;
-  document.getElementById("search-id").value = "";
-  document.getElementById("search-class").value = "";
-  document.getElementById("search-day").value = "";
+  for (const id of ['limit-to-sub', 'limit-to-sub-mobile'])
+    document.getElementById(id).checked = false;
+
+  for (const id of [
+    'search-id',
+    'search-class',
+    'search-day',
+    'embed-search-id',
+    'embed-search-class',
+    'embed-search-day'
+  ])
+    document.getElementById(id).value = "";
   PYTHON_FILTERED_IDS = null;
   applySimpleFilters();
 }

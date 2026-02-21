@@ -122,6 +122,7 @@ body {
 
 #map-container {
     @apply relative w-full h-full bg-black;
+    touch-action: none;
 }
 
 #detail-panel {
