@@ -38,7 +38,7 @@ cd aicup-birds-radar-detection-tool
     ```bash
     conda create --prefix .venv python=3.14
     conda activate ./.venv
-    pip3 install .
+    pip3 install -r requirements.txt
     python3 app.py
     ```
 
@@ -53,7 +53,7 @@ cd aicup-birds-radar-detection-tool
     # On Windows (PowerShell):
     .venv\Scripts\Activate.ps1
 
-    pip3 install .
+    pip3 install -r requirements.txt
 
     python3 app.py
     ```
