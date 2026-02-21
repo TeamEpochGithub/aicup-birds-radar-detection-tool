@@ -1,3 +1,14 @@
+"""
+app.py
+
+Provides a simple local development server for the birds radar track website tool for AI Cup 2026 
+This server is absolutely not suited to publish the website on the web, see static site in README.md for that
+
+Author: Reindert Pelsma <reindertpelsma@teamepoch.net>
+Copyright (c) 2026 Team Epoch - AI Cup 2026
+License: MIT
+"""
+
 import io
 import os
 import secrets

@@ -1,6 +1,16 @@
-# The goal of this script is to compress the train.csv and test.csv to a smaller binary format
-# so the site is mobile friendly to load and the files are easier to compress to an acceptable format size
-# The test CSV is obfuscated to make it clear to users that scraping and reverse engineering the test file without agreeing to the competition rules is forbidden.
+"""
+encode_data.py
+
+The goal of this script is to compress the train.csv and test.csv to a smaller binary format 
+for the birds radar track website tool for AI Cup 2026 
+so the site is mobile friendly to load and the files are easier to compress to an acceptable format size
+The test CSV is obfuscated to make it clear to users that scraping and reverse engineering the test file 
+without agreeing to the competition rules is forbidden.
+
+Author: Reindert Pelsma <reindertpelsma@teamepoch.net>
+Copyright (c) 2026 Team Epoch - AI Cup 2026
+License: MIT
+"""
 
 import pandas as pd
 import struct

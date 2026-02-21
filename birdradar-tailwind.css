@@ -1,3 +1,26 @@
+/**
+ * styles.css
+ * Main tailwind configuration/stylesheet for the birds radar track website tool for AI Cup 2026 
+ * Needs to be compiled into birdradar.compiled.css using the following commands:
+ *
+ * curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
+ * 
+ * # Make it executable (on unix)
+ * chmod +x tailwindcss-linux-x64
+ * 
+ * # Compile your CSS
+ * ./tailwindcss-linux-x64 -i ./birdradar-tailwind.css -o ./birdradar.compiled.css --content "./index.html,./birdradar.js" --minify
+ * 
+ * Its important to include index.html and birdradar.js to collect all CSS classes to include in the compiled css
+ *
+ * As the given repository must include all files to statically serve over Github pages, means that you must commit 
+ * the birdradar.compiled.css
+ *
+ * Author: Reindert Pelsma <reindertpelsma@teamepoch.net>
+ * Copyright (c) 2026 AI Cup 2026 - Team Epoch
+ * License: MIT
+*/
+
 @import "tailwindcss";
 
 /* Explicitly scan these files for utility classes */

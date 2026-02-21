@@ -1,3 +1,11 @@
+/**
+ * @file        birdradar.js
+ * @description Frontend javascript for the birds radar track website tool for AI Cup 2026
+ * @author      Reindert Pelsma <reindertpelsma@teamepoch.net>
+ * @copyright   Copyright (c) 2026 Team Epoch
+ * @license     MIT
+*/
+
 const {
   DeckGL,
   PathLayer,

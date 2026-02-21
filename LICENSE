@@ -1,6 +1,7 @@
 MIT License
 
 Copyright (c) 2026 AI Cup 2026 - Team Epoch
+Author: Reindert Pelsma <reindertpelsma@teamepoch.net>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +35,7 @@ These data files are licensed under:
 
 Creative Commons Attribution-NonCommercial 4.0 International License with the following attribution
 
-Copyright (c) 2026 AI Cup 2026, AIC4NL | Team Epoch
+Copyright (c) 2026 AI Cup 2026, Team Epoch
 Dataset provided by TNO (Netherlands Organisation for Applied Scientific Research)
 
 This attribution and the license shall be included in any derivative work of the train dataset.
@@ -47,7 +48,7 @@ https://creativecommons.org/licenses/by-nc/4.0/
 DATA USE RESTRICTIONS ON TEST SET
 
 The MIT License above applies to the source code and documentation of this 
-repository. It DOES NOT apply to the train files included in this repository, 
+repository. It does not apply to the test dataset files included in this repository, 
 specifically:
 - test.csv
 - test.bin
@@ -56,7 +57,7 @@ specifically:
 These fall under the following conditiions:
 
 1. COMPETITION RULES FOR TEST SET
-   Access to and use of the test set (`test.csv`, `test.bin`, `debug_introduction_notebook_submission.csv`) is strictly 
+   Access to and use of the test set is strictly 
    conditional upon agreeing to the terms and rules of the AI Cup 2026 – 
    Performance Track competition. By accessing these files, you acknowledge 
    that you have read and agreed to the rules located at:
@@ -66,7 +67,7 @@ These fall under the following conditiions:
 
 2. NO REVERSE ENGINEERING OF TEST SET
    You may not attempt to reverse engineer, de-anonymize, or manually label 
-   the test set data. (`test.csv`, `test.bin`, `debug_introduction_notebook_submission.csv`)
+   the test set data.
 
    You agree that you use the test data only to calculate, submit and debug submissions for the 
    AI Cup 2026 competition only until the test data, if it happens, is revealed by the competition organizers.

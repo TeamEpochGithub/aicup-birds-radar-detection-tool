@@ -1,6 +1,15 @@
-# Author: Willem Dieleman - AI Cup 2026.
-# Modified by Reindert Pelsma: added debug submission output as example for the radar track website
+"""
+introduction_workshop.py
 
+Introduction workshop of the kaggle competition of AI Cup 2026, https://www.teamepoch.ai/ai-cup-2026/
+Modified to output a debug submission csv for the website, as a sample to visualize predictions
+
+Author: Willem Dieleman <willemdieleman@teamepoch.net>
+        Rein Viegers <reinviegers@teamepoch.net>
+        Modified by Reindert Pelsma <reindertpelsma@teamepoch.net>
+Copyright (c) 2026 Team Epoch - AI Cup 2026
+License: MIT
+"""
 
 import pandas as pd
 import sklearn.metrics

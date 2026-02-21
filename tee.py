@@ -1,3 +1,14 @@
+"""
+tee.py
+
+The goal of this script is to collect stdout and stderr from a script executed by
+/api/python in app.py for local development
+
+Author: Reindert Pelsma <reindertpelsma@teamepoch.net>
+Copyright (c) 2026 Team Epoch - AI Cup 2026
+License: MIT
+"""
+
 import io
 import sys
 from contextlib import contextmanager

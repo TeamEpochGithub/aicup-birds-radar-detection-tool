@@ -1,9 +1,14 @@
 [project]
 name = "aicup-birds-radar-detection-tool"
-version = "0.1.0"
-description = "Add your description here"
+version = "1.0.0"
+description = "This is an interactive visualization and Feature Engineering tool for the AI Cup 2026: Bird Track Radar Challenge. https://www.teamepoch.ai/ai-cup-2026/"
 readme = "README.md"
 requires-python = ">=3.14"
+authors = [
+    { name = "Reindert Pelsma", email = "reindertpelsma@teamepoch.net" },
+    { name = "AI Cup 2026 - Team Epoch" }
+]
+license = { file = "LICENSE" }
 dependencies = [
     "dotenv>=0.9.9",
     "flask>=3.1.2",
@@ -13,3 +18,8 @@ dependencies = [
     "scipy>=1.17.0",
     "shapely>=2.1.2",
 ]
+
+[project.urls]
+Homepage = "https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/"
+Repository = "https://github.com/TeamEpochGithub/aicup-birds-radar-detection-tool"
+Documentation = "https://github.com/TeamEpochGithub/aicup-birds-radar-detection-tool/blob/main/README.md"

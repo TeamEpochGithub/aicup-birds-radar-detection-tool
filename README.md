@@ -1,8 +1,8 @@
 # 🦅 BirdRadar - AI Cup 2026 Bird Track Radar
 
-**BirdRadar** is a powerful web application designed for auditing, visualizing, and feature engineering radar track data for the AI Cup 2026.
+**BirdRadar** is a powerful web application designed for auditing, visualizing, and feature engineering radar track data for the [AI Cup 2026](https://www.teamepoch.ai/ai-cup-2026/).
 
-Website [https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/](https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/)
+👉 Go the website to view the tool [https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/](https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/)
 
 ## Key Features
 
@@ -13,6 +13,11 @@ Website [https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/](ht
 * **Statistics Lab:** Analyze Covariate Shift by comparing Feature Distributions between Train and Test sets.
 
 ## Quick Start
+
+0. **Website**:
+You can open the tool in your browser [https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/](https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/)
+
+If you want to use your local python environment instead, then install the repository locally.
 
 1. **Clone the repo:**
 ```bash
@@ -33,7 +38,7 @@ cd aicup-birds-radar-detection-tool
     ```bash
     conda create --prefix .venv python=3.14
     conda activate ./.venv
-    pip3 install -r requirements.txt
+    pip3 install .
     python3 app.py
     ```
 
@@ -43,12 +48,12 @@ cd aicup-birds-radar-detection-tool
     python3 -m venv .venv
 
     # On macOS / Linux:
-    source venv/bin/activate
+    source .venv/bin/activate
 
     # On Windows (PowerShell):
     .venv\Scripts\Activate.ps1
 
-    pip3 install -r requirements.txt
+    pip3 install .
 
     python3 app.py
     ```
@@ -82,7 +87,8 @@ Required files to statically serve:
 - test.bin (optional)
 - debug_introduction_notebook_submission.csv (optional)
 
-This is used at [https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/](https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/). 
+This is used for the [Github Pages](https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/) version
+of the website. 
 
 For embedding the site see [embedding.md](embedding.md)
 
@@ -169,7 +175,7 @@ See [introduction_workshop.py](introduction_workshop.py)
 
 ## 🛠️ Built With
 
-* **Pyodide:** Python 3.11 running in WebAssembly.
+* **Pyodide:** Python 3.14 running in WebAssembly.
 * **Deck.gl:** High-performance WebGL map rendering.
 * **MapLibre:** Base vector maps.
 * **Plotly.js:** 3D Scatter plots and statistical charts.
@@ -181,7 +187,7 @@ See [introduction_workshop.py](introduction_workshop.py)
 ```bash
 curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64
 
-# Make it executable
+# Make it executable (on unix)
 chmod +x tailwindcss-linux-x64
 
 # Compile your CSS
@@ -196,8 +202,10 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 * Source code is licensed under [MIT](https://choosealicense.com/licenses/mit/)
 * The train dataset falls under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) with the attribution 
-described in [LICENSE.md](LICENSE.md)
+described in [LICENSE](LICENSE)
 * The test dataset falls under [AI Cup 2026 competition rules](https://www.kaggle.com/competitions/ai-cup-2026-performance/rules), please remove these files for any derivative work of this repository.
 * Reserved names are excluded from open source licenses
 
-See [LICENSE.md](LICENSE.md) for precise definitions
+See [LICENSE](LICENSE) for precise definitions
+
+Author: Reindert Pelsma [reindertpelsma@teamepoch.net](mailto:reindertpelsma@teamepoch.net)
