@@ -178,7 +178,7 @@ def calculate(coords, times, meta):
     }
     
 # The teamepochgithub.github.io/aicup-birds-radar-detection-tool/ website uses your browser as Python engine. Python support is limited. 
-# setup the tool locally to use your own full python environment https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/`,
+# setup the tool locally to use your own full python environment https://github.com/TeamEpochGithub/aicup-birds-radar-detection-tool`,
   filter: `import numpy as np
     
 def filter(coords, times, meta):
@@ -214,7 +214,7 @@ def filter(coords, times, meta):
     return is_small and is_fast
     
 # The teamepochgithub.github.io/aicup-birds-radar-detection-tool/ website uses your browser as Python engine. Python support is limited. 
-# setup the tool locally to use your own full python environment https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/`,
+# setup the tool locally to use your own full python environment https://github.com/TeamEpochGithub/aicup-birds-radar-detection-tool`,
 };
 
 let PYODIDE = null,
