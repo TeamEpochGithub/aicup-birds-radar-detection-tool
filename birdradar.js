@@ -520,7 +520,7 @@ async function executePython(code, globals, funcName, params) {
 
   // 2. Pyodide Fallback
   if (!PYODIDE) await loadPyodideEngine();
-  updateEngineStatus("Pyodide (WASM) in browser");
+  updateEngineStatus("Python in webbrowser (Pyodide)");
 
   await checkAndInstallImports(code);
   await PYODIDE.runPythonAsync(code);
@@ -532,7 +532,7 @@ async function executePython(code, globals, funcName, params) {
 
   if (!didToldTheUserAboutPackages)
     log(
-      'NOTE: Using your browser as python engine, python support is limited. Packages usually auto-install some packages can be installed by import micropip + await micropip.install("package-name"). See https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/ to use your own full python environment.',
+      'NOTE: Using your browser as python engine, python support is limited. Packages usually auto-install some packages can be installed by import micropip + await micropip.install("package-name"). See https://github.com/TeamEpochGithub/aicup-birds-radar-detection-tool to use your own full python environment.',
       "text-slate-300",
     );
   didToldTheUserAboutPackages = true;
