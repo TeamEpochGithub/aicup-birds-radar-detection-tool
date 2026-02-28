@@ -175,7 +175,10 @@ def calculate(coords, times, meta):
         "timestamp_end_radar_utc": meta.get("timestamp_end_radar_utc"),
         "min_z": meta.get("min_z"),
         "max_z": meta.get("max_z")
-    }`,
+    }
+    
+# The teamepochgithub.github.io/aicup-birds-radar-detection-tool/ website uses your browser as Python engine. Python support is limited. 
+# setup the tool locally to use your own full python environment https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/`,
   filter: `import numpy as np
     
 def filter(coords, times, meta):
@@ -208,7 +211,10 @@ def filter(coords, times, meta):
     is_small = meta.get("radar_bird_size") == "Small bird"
     is_fast = meta.get("airspeed", 0) > 15
     
-    return is_small and is_fast`,
+    return is_small and is_fast
+    
+# The teamepochgithub.github.io/aicup-birds-radar-detection-tool/ website uses your browser as Python engine. Python support is limited. 
+# setup the tool locally to use your own full python environment https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/`,
 };
 
 let PYODIDE = null,
@@ -526,7 +532,7 @@ async function executePython(code, globals, funcName, params) {
 
   if (!didToldTheUserAboutPackages)
     log(
-      'NOTE: Using your browser as python engine. Packages usually auto-install some packages can be installed by import micropip + await micropip.install("package-name")',
+      'NOTE: Using your browser as python engine, python support is limited. Packages usually auto-install some packages can be installed by import micropip + await micropip.install("package-name"). See https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/ to use your own full python environment.',
       "text-slate-300",
     );
   didToldTheUserAboutPackages = true;
