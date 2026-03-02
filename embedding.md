@@ -106,7 +106,7 @@ function loadBirdRadar() {
     </div>
     ```
 
-    2. Can only put an embedding URL (e.g normally you would put a youtube URL). Put `https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/iframe.html` as embedding URL.
+    2. Can only put an embedding URL (i.e normally you would put a youtube URL in that box). Put `https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/iframe.html` as embedding URL.
 
 3. Simple embedding: render the tool on page load
 
