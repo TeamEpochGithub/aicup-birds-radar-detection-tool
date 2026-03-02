@@ -6,6 +6,8 @@ The static site can be embeded in another website using the following code snipp
 
 1. Lazy embedding: only load the tool when the user interacts with it
 
+If your site editor supports javascript and custom HTML then you can directly use the snippet below.
+
 ```html
 <div id="bird-radar-embed-wrapper" class="bird-radar-wrapper" onclick="loadBirdRadar()">
 
@@ -91,7 +93,22 @@ function loadBirdRadar() {
 </style>
 ```
 
-2. Simple embedding: render the tool on page load
+2. Lazy embedding for sites that do not support javascript (e.g only iframe)
+    1. HTML is supported, but not javascript
+    ```html
+    <div class="bird-radar-embed-container" style="position: relative; width: 100%; height: 850px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid #334155;">
+        <iframe 
+            src="https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/iframe.html" 
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
+            allowfullscreen>
+        </iframe>
+    </div>
+    ```
+
+    2. Can only put an embedding URL (e.g normally you would put a youtube URL). Put `https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/iframe.html` as embedding URL.
+
+3. Simple embedding: render the tool on page load
 
 ```html
 <div class="bird-radar-embed-container" style="position: relative; width: 100%; height: 850px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid #334155;">
@@ -103,6 +120,8 @@ function loadBirdRadar() {
     </iframe>
 </div>
 ```
+
+
 
 The embedded tool is a subset of the full tool:
 
