@@ -71,7 +71,7 @@ function loadBirdRadar() {
     z-index: 10; 
     transition: opacity 0.3s ease;
     /* --- MOBILE IMAGE URL GOES HERE --- */
-    background-image: url('https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/screenshots/bird-radar-screenshot-mobile.jpeg'); 
+    background-image: url('https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/screenshots/bird-radar-placeholder-mobile.jpeg'); 
 }
 
 /* Desktop Styles (Applied when screen is wider than 768px) */
@@ -82,7 +82,7 @@ function loadBirdRadar() {
     
     .bird-radar-bg {
         /* --- DESKTOP IMAGE URL GOES HERE --- */
-        background-image: url('https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/screenshots/bird-radar-screenshot.jpeg');
+        background-image: url('https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/screenshots/bird-radar-placeholder-desktop.jpeg');
     }
 }
 
@@ -109,6 +109,8 @@ function loadBirdRadar() {
     2. Can only put an embedding URL (i.e normally you would put a youtube URL in that box). Put `https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/iframe.html` as embedding URL.
 
 3. Simple embedding: render the tool on page load
+
+**NOTE** The bird radar is around 5MB, if its placed on a page where the majority of the users will not interact with the tool then this can have a noticeable impact on page load. Recommended is to use the lazy load approach.
 
 ```html
 <div class="bird-radar-embed-container" style="position: relative; width: 100%; height: 850px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid #334155;">
