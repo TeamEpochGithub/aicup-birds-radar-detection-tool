@@ -110,7 +110,7 @@ function loadBirdRadar() {
 
 3. Simple embedding: render the tool on page load
 
-**NOTE** The bird radar is around 5MB, if its placed on a page where the majority of the users will not interact with the tool then this can have a noticeable impact on page load. Recommended is to use the lazy load approach.
+**NOTE** The bird radar is around 10MB of network load, if its placed on a page where the majority of the users will not interact with the tool then this can have a noticeable impact on page load. Recommended is to use the lazy load approach.
 
 ```html
 <div class="bird-radar-embed-container" style="position: relative; width: 100%; height: 850px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid #334155;">
