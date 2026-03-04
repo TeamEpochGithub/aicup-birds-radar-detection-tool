@@ -10,42 +10,44 @@
 * **In-Browser Python Engine:** Write Python code to engineer features and filter data. Changes reflect instantly in the grid.
 * **Submission Auditing:** Upload your `submission.csv`. The app calculates your **mAP score** locally and allows you to filter the map by specific predictions.
 * **Debug Columns:** Inject internal model states (embeddings, cluster IDs) into your submission CSV to visualize them alongside ground truth.
-* **Statistics Lab:** Analyze Covariate Shift by comparing Feature Distributions between Train and Test sets.
+* **Statistics Lab:** View distributions over your features on the train set and analyze Covariate Shift by comparing Feature Distributions between Train and Test sets.
 
-## Quick Start
+## Quick Start Local Installation
 
-0. **Website**:
-You can open the tool in your browser [https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/](https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/)
+Below are the instructions to launch the Brid Radar tool on your personal laptop/PC. After following this setup, your python code on the website will be executed in your local python environment.
 
-If you want to use your local python environment instead, then install the repository locally.
+1. **Local Installation:**
+    1. **Requirements**
+       You need to install `requirements.txt` packages and start `app.py` of this Github repository. Below instructions to do that in the command prompt. Feel free to use any python tool you prefer.
 
-1. **Clone the repo:**
-```bash
-git clone https://github.com/TeamEpochGithub/aicup-birds-radar-detection-tool.git
-cd aicup-birds-radar-detection-tool
-```
+       Cloning the repo using git
+       ```bash
+       git clone https://github.com/TeamEpochGithub/aicup-birds-radar-detection-tool.git
+       cd aicup-birds-radar-detection-tool
+       ```
 
-2. **Local Installation:**
-    1. [Astral's UV](https://docs.astral.sh/uv/)
+    2. [Astral's UV](https://docs.astral.sh/uv/), if you have UV installed
 
     ```bash
     uv sync
     uv run app.py
     ```
 
-    2. [Anaconda](https://www.anaconda.com/download)
+    3. [Anaconda](https://www.anaconda.com/download), if you have Anaconda installed
+  
+    On windows you can use the Anaconda (Command) Prompt instead of `cmd`
 
     ```bash
     conda create --prefix .venv python=3.14
     conda activate ./.venv
-    pip3 install -r requirements.txt
-    python3 app.py
+    pip install -r requirements.txt
+    python app.py
     ```
 
-    3. Just python
+    4. Just python otherwise
 
     ```bash
-    python3 -m venv .venv
+    python -m venv .venv
 
     # On macOS / Linux:
     source .venv/bin/activate
@@ -53,12 +55,26 @@ cd aicup-birds-radar-detection-tool
     # On Windows (PowerShell):
     .venv\Scripts\Activate.ps1
 
-    pip3 install -r requirements.txt
+    pip install -r requirements.txt
 
-    python3 app.py
+    python app.py
     ```
 
-3. **Open in your browser**
+    Sometimes you have to use `python3` instead of `python` and `pip3`/`python -m pip` instead of `pip`
+
+    If you get the error that `python` cannot be found, please find the location where `python.exe`/`python` is installed, and update your path variable in the command prompt
+
+    ```bash
+    # On macOS / Linux
+    export PATH="/path/to/python/bin/folder:$PATH"
+    
+    # On Windows
+    set PATH=C:\path\to\python\bin\folder;%PATH%
+    ```
+
+    Ensure the folder you add to PATH is the (sub)folder that contains `python.exe`/`python`
+
+4. **Open in your browser**
 
 You get an output as follow:
 ```text
@@ -70,27 +86,6 @@ Engine: Local Python execution enabled via /api/python
 ```
 
 Open the printed URL with token in your browser. Confirm that local python environment is used _Engine: Local Server_ in the status bar.
-
-4. **Static site:**
-
-The app can also be hosted as static site (e.g using nginx, github pages). The python code will then be executed in the user's browser using Pyodide instead on the server, allowing it to be safely shared with other users.
-
-Performance is decent in pyodide but some advanced python functionalities and libraries edge cases might not function.
-
-Required files to statically serve:
-- index.html (ensure / is served as index.html)
-- birdradar.js
-- birdradar.compiled.css (compiled from tailwind's birdradar-tailwind.css)
-- train.bin
-- favicon.ico
-- favicon.png
-- test.bin (optional)
-- debug_introduction_notebook_submission.csv (optional)
-
-This is used for the [Github Pages](https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/) version
-of the website. 
-
-For embedding the site see [embedding.md](embedding.md)
 
 ## Python API Guide
 
@@ -141,6 +136,9 @@ def filter(coords, times, meta):
 
 ```
 
+### 3. Importing python files
+You can import your own python files directly on the website. For this first follow "Quick Start Local Installation" and put your python files/libraries in the same environment. Its also possible to put this tool as a subfolder in your own solution repository, so that the environment is shared.
+
 ## Submission & Debugging
 
 ### Standard Submission
@@ -167,9 +165,11 @@ track_id, ...[classes]... ,cluster_id,embedding_x,outlier_score
 
 ### Train rows
 
-The submission csv for the website can contain extra rows of the train set. The website will then also plot the predicted score against train rows, with the ground truth, and calculate a mean average score. Its useful to put your local cross validation test rows in here.
+The submission csv for the website can contain extra rows of the train set. The website will then also plot the predicted score against train rows, with the ground truth, and calculate a mean average score for the Out of Fold predictions. Its useful to put your local cross validation test rows in here.
 
-Rember that such a enhanced submission csv is invalid for kaggle. Ensure your pipeline creates a stripped submission csv with only probalities for the test data for Kaggle scoring.
+The website cannot compute your score on the test data as it does not have access to the labels, to view your score on the LB submit your submission.csv to Kaggle.
+
+Rember that the enhanced submission csv for the tool is invalid for kaggle. Ensure your pipeline creates a stripped submission csv with only probalities for the test data for Kaggle scoring.
 
 See [introduction_workshop.py](introduction_workshop.py)
 
@@ -193,6 +193,26 @@ chmod +x tailwindcss-linux-x64
 # Compile your CSS
 ./tailwindcss-linux-x64 -i ./birdradar-tailwind.css -o ./birdradar.compiled.css --content "./index.html,./birdradar.js" --minify
 ```
+
+## Static site
+The app can also be hosted as static site (e.g using nginx, github pages). The python code will then be executed in the user's browser using Pyodide instead on the server, allowing it to be safely shared with other users.
+
+Performance is decent in pyodide but some advanced python functionalities and libraries edge cases might not function.
+
+Required files to statically serve:
+- index.html (ensure / is served as index.html)
+- birdradar.js
+- birdradar.compiled.css (compiled from tailwind's birdradar-tailwind.css)
+- train.bin
+- favicon.ico
+- favicon.png
+- test.bin (optional)
+- debug_introduction_notebook_submission.csv (optional)
+
+This is used for the [Github Pages](https://teamepochgithub.github.io/aicup-birds-radar-detection-tool/) version
+of the website. 
+
+For embedding the site see [embedding.md](embedding.md)
 
 ## Contributing
 
